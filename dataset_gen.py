@@ -336,11 +336,15 @@ MARCADORES["<obstacle>"] = [
      }),
 
     # molde 2 - coisa + novamente + reacao
+    # [ALTERADO] banco {coisa} tinha "Something blocking me" — forma verbal que
+    # combinada com {novamente} longo gerava frases tortas:
+    # "Something blocking me as if once wasn't enough."
+    # Restringido a substantivos curtos e nominativos.
     ("<obstacle> {coisa} {novamente}. {reacao}",
      {
          "coisa": [
-             "A wall", "An obstacle", "A barrier",
-             "Something blocking me", "Another wall",
+             "A wall", "An obstacle", "A barrier", "Another wall",
+             "A blockage", "A roadblock",
          ],
          "novamente": [
              "again", "once more", "as usual",
@@ -461,9 +465,19 @@ MARCADORES["<turn_left>"] = [
      }),
 
     # molde 3 - interjeicao + acao
+    # [ALTERADO] interj era INTERJ_SARCASTICA global (compartilhada com turn_right),
+    # causando repeticao entre os dois marcadores ao escalar.
+    # Agora cada um tem sua propria lista com itens distintos.
     ("<turn_left> {interj}. {acao}.",
      {
-         "interj": INTERJ_SARCASTICA,
+         "interj": [
+             "Left it is", "Going left, apparently",
+             "Left. Fine", "Leftward we go",
+             "The left side wins", "Left. My one bold decision",
+             "Left, because right was suspicious",
+             "Left. The sensors have spoken",
+             "Heading left, I suppose",
+         ],
          "acao": [
              "Turning left", "Going left", "Heading left",
              "Taking a left", "Swinging left",
@@ -551,9 +565,19 @@ MARCADORES["<turn_right>"] = [
      }),
 
     # molde 3 - interjeicao + acao
+    # [ALTERADO] interj era INTERJ_SARCASTICA global (compartilhada com turn_left),
+    # causando repeticao entre os dois marcadores ao escalar.
+    # Agora cada um tem sua propria lista com itens distintos.
     ("<turn_right> {interj}. {acao}.",
      {
-         "interj": INTERJ_SARCASTICA,
+         "interj": [
+             "Right it is", "Going right, apparently",
+             "Right. Fine", "Rightward we go",
+             "The right side wins", "Right. Obviously",
+             "Right, because left was worse",
+             "Right. The sensors have decided",
+             "Heading right, I suppose",
+         ],
          "acao": [
              "Turning right", "Going right", "Heading right",
              "Taking a right", "Swinging right",
@@ -680,13 +704,33 @@ MARCADORES["<backup>"] = [
          ],
      }),
 
-    # molde 5 - avaliacao + acao
-    ("<backup> {aval} {acao}.",
+    # molde 5 - contexto + acao + comentario
+    # [ALTERADO] era "{aval} {acao}." — muito seco, sem personalidade.
+    # Ex anterior: "Not ideal. Retreating." / "Not my finest moment. Retreating."
+    # Substituido por molde narrativo com contexto + acao + reacao propria.
+    ("<backup> {contexto}. {acao}. {reacao}.",
      {
-         "aval": AVALIACAO,
+         "contexto": [
+             "That corner and I are getting a divorce",
+             "This spot was a mistake from the start",
+             "Forward was a trap",
+             "I walked right into that one",
+             "That went exactly as expected",
+             "I should have seen that coming",
+             "In retrospect, that was obvious",
+         ],
          "acao": [
              "Reversing", "Backing up", "Retreating",
-             "Going backward",
+             "Going backward", "Backing away",
+         ],
+         "reacao": [
+             "Not defeat, just a tactical nap in motion",
+             "Rewinding my terrible life choices",
+             "Beep beep",
+             "Forward was overrated anyway",
+             "I'll try again in a moment",
+             "A graceful exit",
+             "Strategic withdrawal",
          ],
      }),
 ]
