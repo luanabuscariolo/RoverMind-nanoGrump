@@ -1,8 +1,21 @@
-.venv
-
-files/
-
-__pycache__/*
-
+# Byte-compiled / optimized / DLL files
+__pycache__/
 *.pyc
+*.pyo
+*.pyd
 
+# Ambientes virtuais (pastas onde ficam instaladas as bibliotecas do projeto)
+.venv/
+venv/
+env/
+ENV/
+
+# Pastas de ferramentas de testes e qualidade de código
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Pastas de arquivos de configuração do sistema operacional
+files/
