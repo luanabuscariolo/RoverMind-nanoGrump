@@ -19,3 +19,7 @@ htmlcov/
 
 # Pastas de arquivos de configuração do sistema operacional
 files/
+
+# Arquivos gerados
+modelo_treinado.pt
+vocab.json
