@@ -1,0 +1,40 @@
+<svg width="620" height="320" viewBox="0 0 620 320" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="620" height="320" fill="#ffffff"/>
+  <text x="310" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#333">Máscara causal: cada token só vê a si mesmo e o passado</text>
+
+  <!-- cabeçalhos coluna -->
+  <text x="300" y="70" text-anchor="middle" font-size="12" fill="#555">token 1</text>
+  <text x="400" y="70" text-anchor="middle" font-size="12" fill="#555">token 2</text>
+  <text x="500" y="70" text-anchor="middle" font-size="12" fill="#555">token 3</text>
+  <text x="180" y="55" text-anchor="middle" font-size="11" fill="#777">olha ↓ / para →</text>
+
+  <!-- linha token 1 -->
+  <text x="200" y="102" text-anchor="end" font-size="12" fill="#555">token 1</text>
+  <rect x="255" y="82" width="90" height="40" rx="6" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.4"/>
+  <text x="300" y="106" text-anchor="middle" font-size="12" fill="#0F6E56">vê</text>
+  <rect x="355" y="82" width="90" height="40" rx="6" fill="#f2f2f1" stroke="#c8c8c4" stroke-width="1"/>
+  <text x="400" y="106" text-anchor="middle" font-size="11" fill="#999">futuro ✕</text>
+  <rect x="455" y="82" width="90" height="40" rx="6" fill="#f2f2f1" stroke="#c8c8c4" stroke-width="1"/>
+  <text x="500" y="106" text-anchor="middle" font-size="11" fill="#999">futuro ✕</text>
+
+  <!-- linha token 2 -->
+  <text x="200" y="152" text-anchor="end" font-size="12" fill="#555">token 2</text>
+  <rect x="255" y="132" width="90" height="40" rx="6" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.4"/>
+  <text x="300" y="156" text-anchor="middle" font-size="12" fill="#0F6E56">vê</text>
+  <rect x="355" y="132" width="90" height="40" rx="6" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.4"/>
+  <text x="400" y="156" text-anchor="middle" font-size="12" fill="#0F6E56">vê</text>
+  <rect x="455" y="132" width="90" height="40" rx="6" fill="#f2f2f1" stroke="#c8c8c4" stroke-width="1"/>
+  <text x="500" y="156" text-anchor="middle" font-size="11" fill="#999">futuro ✕</text>
+
+  <!-- linha token 3 -->
+  <text x="200" y="202" text-anchor="end" font-size="12" fill="#555">token 3</text>
+  <rect x="255" y="182" width="90" height="40" rx="6" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.4"/>
+  <text x="300" y="206" text-anchor="middle" font-size="12" fill="#0F6E56">vê</text>
+  <rect x="355" y="182" width="90" height="40" rx="6" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.4"/>
+  <text x="400" y="206" text-anchor="middle" font-size="12" fill="#0F6E56">vê</text>
+  <rect x="455" y="182" width="90" height="40" rx="6" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.4"/>
+  <text x="500" y="206" text-anchor="middle" font-size="12" fill="#0F6E56">vê</text>
+
+  <text x="310" y="260" text-anchor="middle" font-size="12" fill="#555">O futuro vira -∞ antes do softmax, o que o zera: peso 0.</text>
+  <text x="310" y="284" text-anchor="middle" font-size="12" fill="#777">A parte de cima do triângulo fica sempre bloqueada.</text>
+</svg>

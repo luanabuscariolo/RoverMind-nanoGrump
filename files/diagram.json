@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "author": "Robô Autônomo ESP32",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-v1",
+      "id": "esp",
+      "top": 100,
+      "left": 200,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb",
+      "top": 400,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "ultra",
+      "top": -60,
+      "left": 80,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "servo",
+      "top": -60,
+      "left": 350,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledFrente",
+      "top": 420,
+      "left": 100,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledTras",
+      "top": 420,
+      "left": 180,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledEsquerda",
+      "top": 420,
+      "left": 260,
+      "attrs": { "color": "yellow" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledDireita",
+      "top": 420,
+      "left": 340,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 460,
+      "left": 100,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 460,
+      "left": 180,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 460,
+      "left": 260,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": 460,
+      "left": 340,
+      "attrs": { "value": "220" }
+    }
+  ],
+  "connections": [
+    ["esp:3V3",   "bb:tp.1",    "red",    []],
+    ["esp:GND.1", "bb:tn.1",    "black",  []],
+
+    ["bb:tp.2",   "ultra:VCC",  "red",    []],
+    ["bb:tn.2",   "ultra:GND",  "black",  []],
+    ["esp:D32",   "ultra:TRIG", "blue",   []],
+    ["esp:D33",   "ultra:ECHO", "green",  []],
+
+    ["bb:tp.3",   "servo:V+",   "red",    []],
+    ["bb:tn.3",   "servo:GND",  "black",  []],
+    ["esp:D13",   "servo:PWM",  "orange", []],
+
+    ["esp:D14",   "r1:1",       "green",  []],
+    ["r1:2",      "ledFrente:A","green",  []],
+    ["ledFrente:C","bb:tn.4",   "black",  []],
+
+    ["esp:D27",   "r2:1",       "red",    []],
+    ["r2:2",      "ledTras:A",  "red",    []],
+    ["ledTras:C", "bb:tn.5",    "black",  []],
+
+    ["esp:D26",   "r3:1",       "yellow", []],
+    ["r3:2",      "ledEsquerda:A","yellow",[]],
+    ["ledEsquerda:C","bb:tn.6", "black",  []],
+
+    ["esp:D25",   "r4:1",       "blue",   []],
+    ["r4:2",      "ledDireita:A","blue",  []],
+    ["ledDireita:C","bb:tn.7",  "black",  []]
+  ]
+}

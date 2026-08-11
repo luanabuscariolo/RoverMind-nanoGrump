@@ -1,0 +1,26 @@
+<svg width="620" height="330" viewBox="0 0 620 330" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="aM" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="620" height="330" fill="#ffffff"/>
+  <text x="310" y="26" text-anchor="middle" font-size="15" font-weight="700" fill="#333">O token 'a' reunindo contexto (3 passos)</text>
+
+  <rect x="30" y="44" width="560" height="72" rx="10" fill="#e8f4f0" stroke="#0F6E56" stroke-width="1.5"/>
+  <text x="48" y="66" font-size="14" font-weight="700" fill="#0F6E56">1. Produto escalar — Query de 'a' contra cada Key</text>
+  <text x="48" y="88" font-size="12" fill="#333">Q('a')·K('a') = [2,0]·[1,0] = 2      Q('a')·K('b') = [2,0]·[0,1] = 0</text>
+  <text x="48" y="107" font-size="12" fill="#333">notas = [ 2 , 0 ]</text>
+  <line x1="310" y1="116" x2="310" y2="132" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#aM)"/>
+
+  <rect x="30" y="134" width="560" height="72" rx="10" fill="#f4f2fc" stroke="#534AB7" stroke-width="1.5"/>
+  <text x="48" y="156" font-size="14" font-weight="700" fill="#534AB7">2. Softmax — notas viram pesos que somam 100%</text>
+  <text x="48" y="178" font-size="12" fill="#333">e² ≈ 7,39   e⁰ = 1   total = 8,39</text>
+  <text x="48" y="197" font-size="12" fill="#333">pesos = [ 0,88 , 0,12 ]   →   88% em 'a', 12% em 'b'</text>
+  <line x1="310" y1="206" x2="310" y2="222" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#aM)"/>
+
+  <rect x="30" y="224" width="560" height="80" rx="10" fill="#fbe6e2" stroke="#B23A2E" stroke-width="1.5"/>
+  <text x="48" y="246" font-size="14" font-weight="700" fill="#B23A2E">3. Soma ponderada dos Values — o novo vetor de 'a'</text>
+  <text x="48" y="268" font-size="12" fill="#333">0,88 × [10,0] + 0,12 × [0,10] = [8,8, 0] + [0, 1,2]</text>
+  <text x="48" y="290" font-size="13" font-weight="700" fill="#333">= [ 8,8 , 1,2 ]   ← 'a' com um tempero de 'b'</text>
+</svg>
