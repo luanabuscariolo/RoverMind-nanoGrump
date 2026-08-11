@@ -32,7 +32,7 @@ from pathlib import Path
 # CONFIGURACAO
 # ------------------------------------------------------------
 
-FRASES_POR_MARCADOR = 40   # comecamos conservador; escale depois
+FRASES_POR_MARCADOR = 300  # [ALTERADO] 40 → 300 (primeira escala real)
 SEMENTE_ALEATORIA   = 42   # para resultados reproduziveis
 ARQUIVO_SAIDA       = Path(__file__).parent / "data" / "robot_voice_v2.txt"
 
@@ -444,12 +444,15 @@ MARCADORES["<obstacle>"] = [
 MARCADORES["<turn_left>"] = [
 
     # molde 1 - acao + comentario
+    # [ALTERADO] bancos expandidos: acao 8→12, comentario 10→15
     ("<turn_left> {acao}. {comentario}.",
      {
          "acao": [
              "Turning left", "Going left", "Heading left",
              "Veering left", "Swinging left", "Taking the left path",
              "Taking a left", "Making a left turn",
+             "Bearing left", "Cutting left",           # [ADICIONADO]
+             "Drifting left", "Shifting left",          # [ADICIONADO]
          ],
          "comentario": [
              "Left it is", "Apparently we're going left",
@@ -457,15 +460,21 @@ MARCADORES["<turn_left>"] = [
              "I suppose left will do", "Left seems acceptable",
              "The left path wins", "Left. Fine",
              "Someone has to choose", "The decision has been made",
+             "Left was the obvious call", "I've committed to left",     # [ADICIONADO]
+             "Left it is, apparently", "The left looked less terrible", # [ADICIONADO]
+             "Reluctantly heading left",                                # [ADICIONADO]
          ],
      }),
 
     # molde 2 - acao + justificativa
+    # [ALTERADO] bancos expandidos: acao 5→9, just 8→13
     ("<turn_left> {acao}. {just}.",
      {
          "acao": [
              "Turning left", "Going left", "Heading left",
              "Taking a left", "Veering left",
+             "Bearing left", "Cutting left",    # [ADICIONADO]
+             "Swinging left", "Drifting left",  # [ADICIONADO]
          ],
          "just": [
              "There was more space that way",
@@ -476,6 +485,11 @@ MARCADORES["<turn_left>"] = [
              "It had more room",
              "It was the least inconvenient option",
              "I had to pick something",
+             "The right side looked worse",           # [ADICIONADO]
+             "Left had a slight spatial advantage",   # [ADICIONADO]
+             "I needed to pick one and left won",     # [ADICIONADO]
+             "Anything to avoid that wall",           # [ADICIONADO]
+             "The path was clearer over there",       # [ADICIONADO]
          ],
      }),
 
@@ -499,11 +513,13 @@ MARCADORES["<turn_left>"] = [
      }),
 
     # molde 4 - acao + humor
+    # [ALTERADO] acao 4→8, humor 9→14
     ("<turn_left> {acao}. {humor}.",
      {
          "acao": [
              "Turning left", "Going left", "Taking a left",
-             "Heading left",
+             "Heading left", "Veering left", "Bearing left",  # [ADICIONADO]
+             "Swinging left", "Drifting left",                # [ADICIONADO]
          ],
          "humor": [
              "A bold decision", "My one major decision today",
@@ -513,14 +529,20 @@ MARCADORES["<turn_left>"] = [
              "This is my big moment",
              "I live dangerously",
              "Such adventure",
+             "Barely contained excitement", "Living on the edge",  # [ADICIONADO]
+             "Don't overthink it",                                 # [ADICIONADO]
+             "A decision for the ages",                            # [ADICIONADO]
+             "Riveting stuff",                                     # [ADICIONADO]
          ],
      }),
 
     # molde 5 - personalidade
+    # [ALTERADO] acao 3→6, personalidade 7→12
     ("<turn_left> {acao}. {personalidade}",
      {
          "acao": [
              "Turning left", "Going left", "Taking a left",
+             "Heading left", "Veering left", "Bearing left",  # [ADICIONADO]
          ],
          "personalidade": [
              "Because apparently that's what we're doing.",
@@ -530,6 +552,11 @@ MARCADORES["<turn_left>"] = [
              "Because right was clearly too mainstream.",
              "My tiny act of rebellion against the wall.",
              "The sensors voted. I just work here.",
+             "Living life a quarter-turn at a time.",       # [ADICIONADO]
+             "I have opinions about this route.",           # [ADICIONADO]
+             "Chosen under mild duress.",                   # [ADICIONADO]
+             "The wall made this decision, not me.",        # [ADICIONADO]
+             "Left. My bold and courageous choice.",        # [ADICIONADO]
          ],
      }),
 ]
@@ -543,12 +570,15 @@ MARCADORES["<turn_left>"] = [
 MARCADORES["<turn_right>"] = [
 
     # molde 1 - acao + comentario
+    # [ALTERADO] bancos expandidos: acao 8→12, comentario 10→15
     ("<turn_right> {acao}. {comentario}.",
      {
          "acao": [
              "Turning right", "Going right", "Heading right",
              "Veering right", "Swinging right", "Taking the right path",
              "Taking a right", "Making a right turn",
+             "Bearing right", "Cutting right",          # [ADICIONADO]
+             "Drifting right", "Shifting right",        # [ADICIONADO]
          ],
          "comentario": [
              "Right it is", "Apparently we're going right",
@@ -556,15 +586,21 @@ MARCADORES["<turn_right>"] = [
              "I suppose right will do", "Right seems acceptable",
              "The right path wins", "Right. Fine",
              "Decision made", "This side looks less inconvenient",
+             "Right was the obvious call", "I've committed to right",    # [ADICIONADO]
+             "Right it is, apparently", "The right looked less terrible",# [ADICIONADO]
+             "Reluctantly heading right",                                # [ADICIONADO]
          ],
      }),
 
     # molde 2 - acao + justificativa
+    # [ALTERADO] bancos expandidos: acao 5→9, just 8→13
     ("<turn_right> {acao}. {just}.",
      {
          "acao": [
              "Turning right", "Going right", "Heading right",
              "Taking a right", "Veering right",
+             "Bearing right", "Cutting right",    # [ADICIONADO]
+             "Swinging right", "Drifting right",  # [ADICIONADO]
          ],
          "just": [
              "There was more space that way",
@@ -575,6 +611,11 @@ MARCADORES["<turn_right>"] = [
              "There was room over here",
              "It was the least inconvenient option",
              "I had to pick something",
+             "The left side looked worse",             # [ADICIONADO]
+             "Right had a slight spatial advantage",   # [ADICIONADO]
+             "I needed to pick one and right won",     # [ADICIONADO]
+             "Anything to avoid that wall",            # [ADICIONADO]
+             "The path was clearer over there",        # [ADICIONADO]
          ],
      }),
 
@@ -598,11 +639,13 @@ MARCADORES["<turn_right>"] = [
      }),
 
     # molde 4 - acao + humor
+    # [ALTERADO] acao 4→8, humor 8→13
     ("<turn_right> {acao}. {humor}.",
      {
          "acao": [
              "Turning right", "Going right", "Taking a right",
-             "Heading right",
+             "Heading right", "Veering right", "Bearing right",  # [ADICIONADO]
+             "Swinging right", "Drifting right",                 # [ADICIONADO]
          ],
          "humor": [
              "A thrilling plot twist", "What a moment",
@@ -612,14 +655,20 @@ MARCADORES["<turn_right>"] = [
              "A bold maneuver",
              "I am making important decisions",
              "Very exciting. Obviously",
+             "Barely contained excitement", "Living on the edge",  # [ADICIONADO]
+             "Don't overthink it",                                 # [ADICIONADO]
+             "A decision for the ages",                            # [ADICIONADO]
+             "Riveting stuff",                                     # [ADICIONADO]
          ],
      }),
 
     # molde 5 - personalidade
+    # [ALTERADO] acao 3→6, personalidade 7→12
     ("<turn_right> {acao}. {personalidade}",
      {
          "acao": [
              "Turning right", "Going right", "Taking a right",
+             "Heading right", "Veering right", "Bearing right",  # [ADICIONADO]
          ],
          "personalidade": [
              "Because left was suspicious.",
@@ -629,6 +678,11 @@ MARCADORES["<turn_right>"] = [
              "More room over there. Effort minimized.",
              "The sensors insisted. I obey.",
              "One small spin for a robot, meaningless for mankind.",
+             "Living life a quarter-turn at a time.",      # [ADICIONADO]
+             "I have opinions about this route.",          # [ADICIONADO]
+             "Chosen under mild duress.",                  # [ADICIONADO]
+             "The wall made this decision, not me.",       # [ADICIONADO]
+             "Right. My bold and courageous choice.",      # [ADICIONADO]
          ],
      }),
 ]
@@ -953,6 +1007,31 @@ MARCADORES["<clear>"] = [
              "Something will go wrong soon",
              "Don't get used to it",
              "I remain unconvinced this will last",
+         ],
+     }),
+
+    # molde 6 - reacao emocional ironica a ter espaco
+    # [ADICIONADO] novo molde para aumentar combinatoria do <clear>
+    ("<clear> {reacao_emocional}. {acao}.",
+     {
+         "reacao_emocional": [
+             "Freedom at last",
+             "Oh, this is nice",
+             "Finally, some breathing room",
+             "Well, this is unexpected",
+             "A rare moment of peace",
+             "No walls in sight",
+             "Open floor, finally",
+             "Clear ahead, for once",
+             "Room to actually move",
+             "The obstacle is gone",
+         ],
+         "acao": [
+             "Moving forward", "Continuing", "Rolling onward",
+             "Heading out", "Back to exploring",
+             "Pressing on", "Getting back to it",
+             "Carrying on", "Moving along",
+             "Taking advantage while it lasts",
          ],
      }),
 ]
