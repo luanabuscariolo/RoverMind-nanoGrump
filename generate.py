@@ -1,11 +1,22 @@
 """
 =============================================================
- GERACAO de texto do nano-grump
+ GERACAO v2 do nano-grump
 =============================================================
 
  Carrega o modelo treinado e faz o robo "falar":
- para cada marcador de situacao, gera uma frase sarcastica,
+ para cada marcador de situacao, gera frases sarcasticas,
  um caractere de cada vez (autorregressivo).
+
+ MUDANCAS DA v2 (em relacao a v1):
+   - le o vocab.json no formato novo (dict com metadados)
+   - amostragem com TOP-K (corta caracteres improvaveis)
+   - parametros configuraveis (temperatura, top_k, n por marcador)
+   - gera VARIAS frases por marcador (para avaliar variedade)
+
+ TOP-K em uma frase:
+   em vez de sortear entre os 59 caracteres (incluindo os
+   improvaveis que geram lixo), mantem so os k mais provaveis
+   e zera o resto antes de sortear.
 
 =============================================================
 """
@@ -23,11 +34,29 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 
 # ------------------------------------------------------------
+# PARAMETROS DE GERACAO (mexa aqui para comparar)
+# ------------------------------------------------------------
+# [ADICIONADO] tudo configuravel num lugar so.
+#   temperatura : < 1 deixa mais "certinho"; > 1 mais "criativo"
+#   top_k       : quantos caracteres mais provaveis manter
+#   n_por_marcador : quantas frases gerar por marcador
+
+TEMPERATURA    = 0.8
+TOP_K          = 5       # [ADICIONADO] mantem so os 5 mais provaveis
+N_POR_MARCADOR = 3       # [ADICIONADO] 3 frases por marcador
+MAX_NOVOS      = 120     # limite de caracteres por frase
+
+
+# ------------------------------------------------------------
 # TOKENIZER (encode e decode)
 # ------------------------------------------------------------
 
 pasta = Path(__file__).parent
-caracteres = json.loads((pasta / "vocab.json").read_text(encoding="utf-8"))
+
+# [ALTERADO] vocab.json agora e um dict; pegamos o campo "vocab".
+_vocab_data = json.loads((pasta / "vocab.json").read_text(encoding="utf-8"))
+caracteres = _vocab_data["vocab"]
+
 stoi = {c: i for i, c in enumerate(caracteres)}
 itos = {i: c for i, c in enumerate(caracteres)}
 
@@ -48,7 +77,7 @@ modelo.eval()   # modo de avaliacao (desliga coisas de treino)
 # FUNCAO DE GERACAO (o ciclo autorregressivo)
 # ------------------------------------------------------------
 
-def gerar(prompt, max_novos=120, temperatura=0.8):
+def gerar(prompt, max_novos=MAX_NOVOS, temperatura=TEMPERATURA, top_k=TOP_K):
     # prompt vira numeros -> tensor (1, T)
     idx = torch.tensor([encode(prompt)], dtype=torch.long, device=device)
 
@@ -62,6 +91,16 @@ def gerar(prompt, max_novos=120, temperatura=0.8):
 
         # pega so a ultima posicao (a previsao do proximo char)
         logits = logits[:, -1, :] / temperatura
+
+        # [ADICIONADO] TOP-K: mantem so os k maiores logits, e coloca
+        # -inf no resto. Assim, os caracteres improvaveis nem entram
+        # no sorteio (viram probabilidade zero apos o softmax).
+        if top_k is not None:
+            # topk devolve os k maiores valores; v[:, [-1]] e o menor
+            # deles (o "corte"). Tudo abaixo do corte vira -inf.
+            v, _ = torch.topk(logits, top_k)
+            corte = v[:, [-1]]
+            logits[logits < corte] = float("-inf")
 
         # vira probabilidades e sorteia 1 caractere
         probs = F.softmax(logits, dim=-1)
@@ -87,9 +126,14 @@ marcadores = [
 ]
 
 print("=" * 55)
-print("   O NANO-GRUMP FALA")
+print("   O NANO-GRUMP v2 FALA")
+print("=" * 55)
+print(f"   temperatura={TEMPERATURA}  top_k={TOP_K}  "
+      f"({N_POR_MARCADOR} frases por marcador)")
 print("=" * 55)
 
 for m in marcadores:
-    frase = gerar(m + " ")
-    print(f"\n{frase.strip()}")
+    print(f"\n--- {m} ---")
+    for _ in range(N_POR_MARCADOR):
+        frase = gerar(m + " ")
+        print(f"  {frase.strip()}")
