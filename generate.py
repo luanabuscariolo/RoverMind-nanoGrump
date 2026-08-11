@@ -41,8 +41,8 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 #   top_k       : quantos caracteres mais provaveis manter
 #   n_por_marcador : quantas frases gerar por marcador
 
-TEMPERATURA    = 0.8
-TOP_K          = 5       # [ADICIONADO] mantem so os 5 mais provaveis
+TEMPERATURA    = 0.75    # [ALTERADO v2-final] 0.8 -> 0.75
+TOP_K          = 4       # [ALTERADO v2-final] 5 -> 4 (config escolhida apos comparacao)
 N_POR_MARCADOR = 3       # [ADICIONADO] 3 frases por marcador
 MAX_NOVOS      = 120     # limite de caracteres por frase
 
