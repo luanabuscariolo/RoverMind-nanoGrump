@@ -335,25 +335,40 @@ MARCADORES["<obstacle>"] = [
          "reacao": REACAO_CURTA + REACAO_SARCASTICA,
      }),
 
-    # molde 2 - coisa + novamente + reacao
-    # [ALTERADO] banco {coisa} tinha "Something blocking me" — forma verbal que
-    # combinada com {novamente} longo gerava frases tortas:
-    # "Something blocking me as if once wasn't enough."
-    # Restringido a substantivos curtos e nominativos.
-    ("<obstacle> {coisa} {novamente}. {reacao}",
+    # molde 2a - coisa + novamente curto + reacao livre
+    # [ALTERADO] molde original combinava {novamente} longo com {reacao} sarcastica,
+    # gerando frases tortas: "Another wall as if once wasn't enough. This is exactly what I wanted."
+    # Solucao: dividir em dois moldes separados por comprimento de {novamente}.
+    ("<obstacle> {coisa} {novamente_curto}. {reacao}",
      {
          "coisa": [
-             "A wall", "An obstacle", "A barrier", "Another wall",
-             "A blockage", "A roadblock",
+             "A wall", "An obstacle", "A barrier",
+             "Another wall", "A blockage", "A roadblock",
          ],
-         "novamente": [
+         "novamente_curto": [
              "again", "once more", "as usual",
-             "here we go again", "yet again",
-             "again, apparently", "again, naturally",
-             "as if once wasn't enough",
-             "because once wasn't enough",
+             "yet again", "once again",
          ],
          "reacao": REACAO_CURTA + REACAO_SARCASTICA,
+     }),
+
+    # molde 2b - coisa + novamente longo (frase completa, sem reacao adicional)
+    # [ADICIONADO] {novamente} longo ja e expressivo o suficiente sozinho;
+    # nao precisa de {reacao} depois — evita o encadeamento torto.
+    ("<obstacle> {coisa} {novamente_longo}.",
+     {
+         "coisa": [
+             "A wall", "An obstacle", "A barrier",
+             "Another wall", "A blockage",
+         ],
+         "novamente_longo": [
+             "again, apparently",
+             "again, naturally",
+             "as if once wasn't enough",
+             "because once wasn't enough",
+             "here we go again",
+             "because of course",
+         ],
      }),
 
     # molde 3 - reacao longa + coisa + localizacao
@@ -464,23 +479,22 @@ MARCADORES["<turn_left>"] = [
          ],
      }),
 
-    # molde 3 - interjeicao + acao
-    # [ALTERADO] interj era INTERJ_SARCASTICA global (compartilhada com turn_right),
-    # causando repeticao entre os dois marcadores ao escalar.
-    # Agora cada um tem sua propria lista com itens distintos.
-    ("<turn_left> {interj}. {acao}.",
+    # molde 3 - frase standalone de direcao
+    # [ALTERADO] era "{interj}. {acao}." — o interj ja continha "left",
+    # e o {acao} repetia ("Left. Fine. Turning left.").
+    # Substituido por frases standalone que dispensam {acao} separado.
+    ("<turn_left> {frase}",
      {
-         "interj": [
-             "Left it is", "Going left, apparently",
-             "Left. Fine", "Leftward we go",
-             "The left side wins", "Left. My one bold decision",
-             "Left, because right was suspicious",
-             "Left. The sensors have spoken",
-             "Heading left, I suppose",
-         ],
-         "acao": [
-             "Turning left", "Going left", "Heading left",
-             "Taking a left", "Swinging left",
+         "frase": [
+             "Left it is. The sensors have spoken.",
+             "Going left, apparently. Not my choice.",
+             "Left. Fine. Moving on.",
+             "Leftward. My one bold decision of the day.",
+             "The left side wins. Barely.",
+             "Left. Because right was clearly too mainstream.",
+             "Heading left, I suppose. Could be worse.",
+             "Left. The wall left me no choice. Obviously.",
+             "Going left. Try to contain your excitement.",
          ],
      }),
 
@@ -564,23 +578,22 @@ MARCADORES["<turn_right>"] = [
          ],
      }),
 
-    # molde 3 - interjeicao + acao
-    # [ALTERADO] interj era INTERJ_SARCASTICA global (compartilhada com turn_left),
-    # causando repeticao entre os dois marcadores ao escalar.
-    # Agora cada um tem sua propria lista com itens distintos.
-    ("<turn_right> {interj}. {acao}.",
+    # molde 3 - frase standalone de direcao
+    # [ALTERADO] era "{interj}. {acao}." — o interj ja continha "right",
+    # e o {acao} repetia ("Right. Fine. Turning right.").
+    # Substituido por frases standalone que dispensam {acao} separado.
+    ("<turn_right> {frase}",
      {
-         "interj": [
-             "Right it is", "Going right, apparently",
-             "Right. Fine", "Rightward we go",
-             "The right side wins", "Right. Obviously",
-             "Right, because left was worse",
-             "Right. The sensors have decided",
-             "Heading right, I suppose",
-         ],
-         "acao": [
-             "Turning right", "Going right", "Heading right",
-             "Taking a right", "Swinging right",
+         "frase": [
+             "Right it is. The sensors have decided.",
+             "Going right, apparently. Not exactly thrilling.",
+             "Right. Fine. Moving on.",
+             "Rightward. Because why not.",
+             "The right side wins. Marginally.",
+             "Right. Because left was suspicious.",
+             "Heading right, I suppose. Could be worse.",
+             "Right. The wall gave me no options.",
+             "Going right. Hold your applause.",
          ],
      }),
 
@@ -916,13 +929,30 @@ MARCADORES["<clear>"] = [
          ],
      }),
 
-    # molde 5 - avaliacao + acao
-    ("<clear> {aval} {acao}.",
+    # molde 5 - contraste ironico: liberdade + expectativa de ruina
+    # [ALTERADO] era "{aval} {acao}." — seco, sem personalidade.
+    # Ex anterior: "Completely unnecessary. Heading out."
+    # Substituido por contraste ironico proprio do <clear>: alivio + ceticismo.
+    ("<clear> {alivio}. {ceticismo}.",
      {
-         "aval": AVALIACAO,
-         "acao": [
-             "Moving forward", "Continuing", "Rolling onward",
-             "Back to exploring", "Heading out",
+         "alivio": [
+             "Clear path",
+             "Open road ahead",
+             "Nothing blocking me",
+             "Room to move",
+             "Free to go",
+             "The way is open",
+             "Space at last",
+         ],
+         "ceticismo": [
+             "Enjoy it while it lasts",
+             "I give it thirty seconds",
+             "The next wall is probably nearby",
+             "This is almost certainly temporary",
+             "I'll find a way to ruin this",
+             "Something will go wrong soon",
+             "Don't get used to it",
+             "I remain unconvinced this will last",
          ],
      }),
 ]

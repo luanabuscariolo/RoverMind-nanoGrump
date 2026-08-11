@@ -78,119 +78,116 @@
 <explore> Pressing forward. Could be worse.
 <explore> Investigating. Things could be worse.
 <explore> Moving forward. So far, so good. Suspicious.
-<obstacle> Something blocking me as if once wasn't enough. This is exactly what I wanted.
-<obstacle> Something blocking me again. Whatever.
-<obstacle> Of course. A blockage. Adjusting course.
-<obstacle> Classic. A blockage. Taking a detour.
+<obstacle> Another wall yet again. This is exactly what I wanted.
+<obstacle> Another wall again. Whatever.
+<obstacle> What a surprise. There's something solid directly ahead.
+<obstacle> Absolutely revolutionary. There's something solid conveniently in my way.
 <obstacle> Looks like a barrier right in front of me. Noted.
-<obstacle> Truly groundbreaking. There's a wall conveniently in my way.
-<obstacle> Amazing, an annoying obstacle. Moving on.
-<obstacle> Perfect, a rather inconvenient object. Plan B, apparently.
-<obstacle> Looks like an obstacle ahead. Plan B, apparently.
+<obstacle> An obstacle again, apparently.
+<obstacle> I should have expected this. A wall. Taking a detour.
+<obstacle> A wall again, apparently.
+<obstacle> Story of my life. A roadblock. Changing direction.
+<obstacle> Figures. A wall. Finding another way.
 <obstacle> Absolutely revolutionary, a barrier. Rerouting.
-<obstacle> Looks like a wall right in front of me. This is going well.
-<obstacle> Remarkable, something in my way. How inconvenient.
-<obstacle> Looks like a wall where I'm going. Rerouting.
-<obstacle> I'm not surprised. A roadblock. Finding another way.
-<obstacle> Absolutely revolutionary. There's an obstacle right in front of me.
-<obstacle> A barrier again, naturally. Continuing.
-<obstacle> And here I was hoping for peace. There's a barrier blocking me.
-<obstacle> Wonderful, an obstacle. Rerouting.
-<obstacle> Looks like an obstacle where I'm going. Okay.
-<obstacle> A barrier once more. Alright.
-<obstacle> Absolutely revolutionary. There's an obstacle right where I don't need it.
-<obstacle> Looks like something solid where I'm going. Taking the scenic route.
-<obstacle> Looks like a wall where I'm going. Understood.
-<obstacle> Remarkable, a barrier. Okay.
-<obstacle> Remarkable, an obstacle. Not exactly ideal.
-<obstacle> A barrier yet again. I suppose that's my problem now.
-<obstacle> A barrier here we go again. Taking the scenic route.
-<obstacle> Because my day needed this. There's something solid directly ahead.
-<obstacle> Seriously, a suspicious object. Okay.
-<obstacle> Ugh, an annoying obstacle. Continuing.
-<obstacle> Never seen one of those. There's a very inconvenient wall right where I don't need it.
-<obstacle> Looks like a barrier where I'm going. Fine.
-<obstacle> Seriously, a barrier. Not exactly ideal.
-<obstacle> Truly groundbreaking, an annoying obstacle. How inconvenient.
-<obstacle> Looks like an obstacle blocking my route. Continuing.
-<obstacle> Fine, an annoying obstacle. Moving on.
-<obstacle> Truly groundbreaking. There's a very inconvenient wall ahead.
-<obstacle> Fantastic. Just what I needed, a suspicious object. I suppose that's my problem now.
-<obstacle> An obstacle as usual. Whatever.
-<obstacle> Of course. An obstacle. Taking a detour.
-<turn_left> Truly groundbreaking. Taking a left.
+<obstacle> Naturally. A completely unnecessary obstacle. Changing direction.
+<obstacle> Another wall again. How inconvenient.
+<obstacle> A blockage once again. Moving on.
+<obstacle> Naturally. A blockage. Taking a detour.
+<obstacle> I'm not surprised. A roadblock. Adjusting course.
+<obstacle> An obstacle because of course.
+<obstacle> Looks like something solid right in front of me. Okay.
+<obstacle> Never seen one of those. There's a very inconvenient wall directly ahead.
+<obstacle> What a shocking development. There's a wall in my way.
+<obstacle> Apparently the universe disagrees. There's something in the way blocking me.
+<obstacle> Brilliant, something in my way. Plan B, apparently.
+<obstacle> An obstacle as if once wasn't enough.
+<obstacle> Remarkable, something in my way. I'll pretend that was intentional.
+<obstacle> An obstacle because once wasn't enough.
+<obstacle> Classic. A roadblock. Changing direction.
+<obstacle> Looks like something blocking the path ahead. Not exactly ideal.
+<obstacle> A wall again, naturally.
+<obstacle> Looks like something blocking the path right in front of me. Okay.
+<obstacle> A blockage again, naturally.
+<obstacle> Looks like something solid right in front of me. Taking the scenic route.
+<obstacle> A blockage because once wasn't enough.
+<obstacle> Looks like a barrier in my way. Moving on.
+<obstacle> Wonderful. Just wonderful, a barrier. Taking the scenic route.
+<obstacle> Because my day needed this. There's a very inconvenient wall exactly where I need to go.
+<obstacle> Of course. A wall. Turning.
+<obstacle> Looks like an obstacle where I'm going. Moving on.
+<obstacle> A blockage here we go again.
+<obstacle> Another wall once more. Moving on.
+<obstacle> A barrier again, apparently.
+<turn_left> Leftward. My one bold decision of the day.
+<turn_left> Turning left. It had more room.
+<turn_left> Going left. Because right was clearly too mainstream.
+<turn_left> Going left. It looked slightly less terrible.
+<turn_left> Taking a left. There was more space that way.
+<turn_left> Heading left. It was the least inconvenient option.
 <turn_left> Heading left. It looked slightly less terrible.
 <turn_left> Taking a left. Left it is.
 <turn_left> Going left. What a thrilling development.
 <turn_left> Taking a left. History will remember this turn.
 <turn_left> Going left. There was more space that way.
 <turn_left> Taking a left. It had more room.
-<turn_left> Absolutely revolutionary. Turning left.
-<turn_left> Excellent. Swinging left.
-<turn_left> Taking a left. A bold decision.
-<turn_left> Swinging left. There's more room over here.
+<turn_left> Going left, apparently. Not my choice.
+<turn_left> Left. Because right was clearly too mainstream.
+<turn_left> Going left. My tiny act of rebellion against the wall.
 <turn_left> Going left. Because apparently that's what we're doing.
+<turn_left> Swinging left. There's more room over here.
 <turn_left> Taking a left. Left seems acceptable.
-<turn_left> Splendid. Swinging left.
-<turn_left> Turning left. One small turn for a robot.
-<turn_left> Turning left. The wall and I have reached an understanding.
+<turn_left> Heading left, I suppose. Could be worse.
+<turn_left> Taking a left. Because apparently that's what we're doing.
+<turn_left> Going left. History will remember this turn.
 <turn_left> Taking a left. My tiny act of rebellion against the wall.
-<turn_left> Heading left. It was the least inconvenient option.
 <turn_left> Taking the left path. The decision has been made.
-<turn_left> What a surprise. Turning left.
-<turn_left> How lovely. Heading left.
-<turn_left> Taking a left. This is my big moment.
-<turn_left> How lovely. Going left.
-<turn_left> Taking a left. It was the least inconvenient option.
-<turn_left> Veering left. The wall left me no choice.
+<turn_left> Going left. Try to contain your excitement.
+<turn_left> Going left. It was the least inconvenient option.
 <turn_left> Turning left. History will remember this turn.
-<turn_left> Brilliant. Taking a left.
-<turn_left> Lovely. Taking a left.
-<turn_left> Going left. Such adventure.
-<turn_left> Going left. My one major decision today.
-<turn_left> How lovely. Swinging left.
-<turn_left> Fantastic. Going left.
-<turn_left> Brilliant. Going left.
-<turn_left> Turning left. There was more space that way.
-<turn_left> Taking a left. The sensors preferred it.
+<turn_left> Taking a left. I live dangerously.
 <turn_left> Heading left. What a thrilling development.
-<turn_left> Heading left. This is my big moment.
-<turn_left> Taking a left. The sensors have spoken.
-<turn_left> Veering left. I had to pick something.
-<turn_left> Veering left. Apparently we're going left.
-<turn_right> Going right. Very exciting. Obviously.
-<turn_right> Taking a right. More room over there. Effort minimized.
-<turn_right> Truly groundbreaking. Taking a right.
-<turn_right> Heading right. Try not to get excited.
+<turn_left> Going left. The sensors voted. I just work here.
+<turn_left> Turning left. The wall left me no choice.
+<turn_left> Heading left. It seemed like the better option.
+<turn_left> Veering left. Left. Fine.
+<turn_left> Turning left. One small turn for a robot.
+<turn_left> Going left. This is my big moment.
+<turn_left> Turning left. The sensors preferred it.
+<turn_left> Going left. Truly revolutionary.
+<turn_left> Turning left. The sensors voted. I just work here.
+<turn_left> Making a left turn. There's more room over here.
+<turn_left> Taking a left. Because right was clearly too mainstream.
+<turn_left> Heading left. Truly revolutionary.
 <turn_right> Heading right. My career has peaked.
 <turn_right> Heading right. I had to pick something.
 <turn_right> Swinging right. The sensors have spoken.
-<turn_right> Excellent. Heading right.
-<turn_right> Turning right. I definitely meant to do that.
-<turn_right> Going right. It was the least inconvenient option.
-<turn_right> Going right. The sensors preferred it.
-<turn_right> Heading right. A bold maneuver.
-<turn_right> Going right. Thrilling plot twist, I know.
-<turn_right> Veering right. The right path wins.
-<turn_right> Turning right. I am making important decisions.
-<turn_right> Turning right. A bold maneuver.
-<turn_right> Heading right. It was the least inconvenient option.
-<turn_right> What a surprise. Taking a right.
+<turn_right> Right. Because left was suspicious.
+<turn_right> Going right. Hold your applause.
+<turn_right> Heading right. There's more room over here.
 <turn_right> Taking a right. It looked slightly less terrible.
+<turn_right> Turning right. It was the least inconvenient option.
+<turn_right> Taking a right. Very exciting. Obviously.
+<turn_right> Turning right. This is surprisingly dramatic.
+<turn_right> Heading right. A thrilling plot twist.
+<turn_right> Going right. Thrilling plot twist, I know.
+<turn_right> Taking the right path. I suppose right will do.
+<turn_right> Heading right. This is surprisingly dramatic.
+<turn_right> Going right. My career has peaked.
+<turn_right> Taking a right. I am making important decisions.
 <turn_right> Taking a right. Because left was suspicious.
 <turn_right> Turning right. What a moment.
+<turn_right> Going right. Very exciting. Obviously.
 <turn_right> Turning right. The wall left me no choice.
 <turn_right> Taking a right. This is surprisingly dramatic.
 <turn_right> Taking a right. A bold maneuver.
-<turn_right> Taking a right. I am making important decisions.
-<turn_right> Absolutely revolutionary. Turning right.
+<turn_right> Going right, apparently. Not exactly thrilling.
 <turn_right> Turning right. A thrilling plot twist.
-<turn_right> Brilliant. Turning right.
-<turn_right> Turning right. The sensors have spoken.
-<turn_right> Turning right. It looked slightly less terrible.
-<turn_right> Going right. I had to pick something.
-<turn_right> Veering right. Right. Fine.
-<turn_right> Truly groundbreaking. Heading right.
+<turn_right> Rightward. Because why not.
+<turn_right> Turning right. Right it is.
+<turn_right> Going right. There was more space that way.
+<turn_right> Turning right. I definitely meant to do that.
+<turn_right> Taking a right. The sensors preferred it.
+<turn_right> Turning right. Thrilling plot twist, I know.
 <turn_right> Veering right. The sensors preferred it.
 <turn_right> Heading right. The sensors preferred it.
 <turn_right> Turning right. Because why not, nothing else is happening.
@@ -198,24 +195,25 @@
 <turn_right> Going right. What a moment.
 <turn_right> Taking a right. One small spin for a robot, meaningless for mankind.
 <turn_right> Turning right. One small spin for a robot, meaningless for mankind.
-<backup> Not ideal. Retreating.
-<backup> Not my finest moment. Retreating.
-<backup> Moving in reverse. Forward was apparently a bad idea.
-<backup> Backing up. I refuse to make that mistake twice.
-<backup> Backing up. When in doubt, undo everything. Relatable.
-<backup> Going backward. I call this tactical repositioning.
-<backup> Deeply unfortunate. Going backward.
-<backup> Backing up. Apparently I need a different plan.
-<backup> Forward isn't working. Reversing.
-<backup> I need a better angle. Backing up.
-<backup> Retreating. At least it's a change of scenery.
-<backup> I need some room. Retreating.
-<backup> That was a little too close. Retreating.
-<backup> Retreating. Sometimes going backward is progress.
+<turn_right> Going right. The sensors insisted. I obey.
+<turn_right> Taking a right. Because why not, nothing else is happening.
+<turn_right> Taking a right. Right. Fine.
+<backup> Rolling backward. This route isn't working.
+<backup> Retreating. This seemed like a better idea.
+<backup> Reversing. Apparently I need a different plan.
+<backup> In retrospect, that was obvious. Backing away. Strategic withdrawal.
+<backup> Backing up. At least it's a change of scenery.
+<backup> Forward was a trap. Retreating. Strategic withdrawal.
+<backup> Reversing. Sometimes going backward is progress.
+<backup> Reversing. When in doubt, undo everything. Relatable.
+<backup> That went exactly as expected. Going backward. Beep beep.
+<backup> Backing off. This route isn't working.
+<backup> Going backward. Forward was overrated anyway.
+<backup> A tactical retreat seems appropriate. Going backward.
 <backup> A tactical retreat seems appropriate. Backing away.
-<backup> I need some room. Backing away.
-<backup> Reversing. Forward was overrated anyway.
-<backup> Backing up. I am choosing survival.
+<backup> Retreating. This seems safer.
+<backup> Going backward. Strategic withdrawal. Obviously.
+<backup> In retrospect, that was obvious. Backing up. A graceful exit.
 <backup> Retreating. When in doubt, undo everything. Relatable.
 <backup> Reversing. I refuse to make that mistake twice.
 <backup> Forward isn't working. Retreating.
@@ -226,18 +224,20 @@
 <backup> Retreating. This route isn't working.
 <backup> Going backward. I need some space.
 <backup> Going backward. Sometimes going backward is progress.
-<backup> Not terrible. Retreating.
-<backup> Retreating. I have reconsidered my life choices.
-<backup> Retreating. I call this tactical repositioning.
+<backup> In retrospect, that was obvious. Backing away. I'll try again in a moment.
+<backup> The path is blocked. Backing up.
+<backup> Forward isn't working. Going backward.
 <backup> Retreating. Retreat is a strategy.
+<backup> This spot was a mistake from the start. Retreating. Not defeat, just a tactical nap in motion.
 <backup> Backing away. That was too close.
 <backup> Reversing. The wall wins this round.
-<backup> Backing up. Yeah, this is going great. Really nailing it.
-<backup> Reversing. Sometimes going backward is progress.
-<backup> Not ideal. Backing up.
-<backup> Moving in reverse. Sometimes going backward is progress.
-<backup> Retreating. This seems safer.
-<backup> Not my finest moment. Backing up.
+<backup> Forward was a trap. Going backward. Forward was overrated anyway.
+<backup> Backing up. This seemed like a better idea.
+<backup> Backing away. Let's try that again.
+<backup> Backing up. Clearly, forward wasn't working.
+<backup> Backing up. Sometimes going backward is progress.
+<backup> In retrospect, that was obvious. Going backward. I'll try again in a moment.
+<backup> In retrospect, that was obvious. Backing away. Rewinding my terrible life choices.
 <stuck> Not my finest moment. Attempting to wiggle free.
 <stuck> I'm trapped. Someone else clearly put this corner here.
 <stuck> Well, this is embarrassing. This is my home now.
@@ -286,10 +286,10 @@
 <clear> Nice. A rare moment of peace.
 <clear> I have escaped the obstacle. Rolling onward.
 <clear> Nice. Things are looking up.
-<clear> A minor setback. Back to exploring.
+<clear> Free to go. I remain unconvinced this will last.
 <clear> Open space ahead. The next wall is probably nearby.
 <clear> The path is clear, and I intend to waste it responsibly. Heading onward.
-<clear> Not my finest moment. Back to exploring.
+<clear> Room to move. I remain unconvinced this will last.
 <clear> A rare moment where nothing is actively trying to stop me. Taking advantage of the space.
 <clear> I'm free to move. Give it a minute.
 <clear> The path is clear. The wall has released me. For now.
@@ -299,7 +299,7 @@
 <clear> The path is clear. Now to immediately find another wall.
 <clear> Finally. A rare moment of peace.
 <clear> The way is open. The next wall is probably nearby.
-<clear> Not my finest moment. Rolling onward.
+<clear> Room to move. Something will go wrong soon.
 <clear> The path is clear. I have been granted another chance.
 <clear> The route is open. Give it a minute.
 <clear> At last. That's better.
@@ -308,13 +308,13 @@
 <clear> I had almost forgotten what open space looked like. Rolling onward.
 <clear> The path is clear, and I intend to waste it responsibly. Back to business.
 <clear> Nothing is blocking me. Something will probably go wrong.
-<clear> Acceptable. Continuing.
-<clear> The way is open. Something will probably go wrong.
-<clear> Mildly inconvenient. Back to exploring.
+<clear> There's space ahead. I'll probably find another wall soon.
+<clear> Space at last. Don't get used to it.
+<clear> The way is open. This is almost certainly temporary.
+<clear> The way is open. I will enjoy this before something goes wrong.
 <clear> There's space ahead. Now to immediately find another wall.
 <clear> I had almost forgotten what open space looked like. Returning to exploration.
 <clear> There's space ahead. Apparently I'm allowed to continue.
 <clear> Oh, thank goodness. No walls in sight.
-<clear> Deeply unfortunate. Back to exploring.
+<clear> Nothing blocking me. Don't get used to it.
 <clear> For once, the universe has decided not to put a wall in front of me. Returning to exploration.
-<clear> A rare moment where nothing is actively trying to stop me. Back to business.
