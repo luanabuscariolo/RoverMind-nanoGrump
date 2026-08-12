@@ -19,6 +19,8 @@ htmlcov/
 
 # Pastas de arquivos de configuração do sistema operacional
 files/
+tutorial/
+demos/
 
 # Arquivos gerados
 modelo_treinado.pt
