@@ -1,4 +1,4 @@
-# 🤖 RoverMind — nano-grump
+# 🤖 RoverMind — Nano-Rabugento
 
 > Um mini-GPT construído do zero que dá voz sarcástica e preguiçosa ao cérebro de
 > um robô autônomo. Cada situação do robô vira uma frase com personalidade.
