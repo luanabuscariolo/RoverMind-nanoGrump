@@ -41,6 +41,18 @@
 U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI
   display(U8G2_R0, /*cs=*/8, /*dc=*/9, /*reset=*/10);
 
+// ------------------------------------------------------------
+// [NOVO] UART do CORPO (ESP32-WROOM-32)
+// O corpo envia os marcadores pela sua UART2 (TX=GPIO17).
+// Aqui no S3 recebemos por esta UART1, no RX=GPIO18.
+// Ligacao fisica: WROOM GPIO17 -> S3 GPIO18, e GND <-> GND.
+// So recebemos (RX); o TX fica num pino qualquer nao usado.
+// ------------------------------------------------------------
+#include <HardwareSerial.h>
+HardwareSerial corpo(1);     // usa a UART1 do ESP32-S3
+#define CORPO_RX_PIN 18      // recebe os marcadores do corpo aqui
+#define CORPO_TX_PIN 17      // nao usado (so precisamos receber)
+
 
 // ============================================================
 // PARTE 1 — CONFIGURACOES E ESTRUTURAS DE DADOS
@@ -555,6 +567,11 @@ void setup() {
   delay(1500);
   Serial.println("\n=== nano-grump v2 ===");
 
+  // [NOVO] Inicializa a UART que recebe os marcadores do corpo.
+  // 9600 baud (mesma velocidade do corpo), 8N1.
+  corpo.begin(9600, SERIAL_8N1, CORPO_RX_PIN, CORPO_TX_PIN);
+  Serial.println("UART do corpo iniciada (RX=GPIO18, 9600 baud).");
+
   // --- 1. Encontrar e mapear a particao "model" ---
   const esp_partition_t *part = esp_partition_find_first(
     ESP_PARTITION_TYPE_DATA, (esp_partition_subtype_t)0x40, "model");
@@ -855,31 +872,61 @@ void display_render(const char *frase) {
   display_speak(frase);
 }
 
+// [NOVO] Processa um marcador recebido (de qualquer fonte).
+// Extraido para funcao propria para ser reusado pela Serial USB
+// e pela UART do corpo, sem duplicar codigo.
+static void processarMarcador(const char *marcador) {
+  // Verificar se e um marcador valido
+  if (strncmp(marcador, "<", 1) == 0) {
+    // Escolher a expressao dos olhos antes de gerar a frase.
+    eye_state = eye_state_from_prompt(marcador);
+
+    // Adicionar espaco apos o marcador (como o generate.py faz)
+    char prompt[34];
+    snprintf(prompt, sizeof(prompt), "%s ", marcador);
+    Serial.printf("\nGerando para: %s\n", marcador);
+    gerar(prompt);
+  } else {
+    Serial.println("Marcador invalido. Use: <start>, <obstacle>, etc.");
+  }
+}
+
+// [NOVO] Buffer separado para a UART do corpo (independente do USB).
+static char corpo_buf[32];
+static int  corpo_len = 0;
+
 void loop() {
-  // Ler caracteres da Serial e acumular ate receber '\n'
+  // ----------------------------------------------------------
+  // FONTE 1: Serial USB (voce digitando marcadores para testar)
+  // ----------------------------------------------------------
   while (Serial.available()) {
     char c = Serial.read();
     if (c == '\n' || c == '\r') {
       if (input_len > 0) {
         input_buf[input_len] = '\0';
-        // Verificar se e um marcador valido
-        if (strncmp(input_buf, "<", 1) == 0) {
-          // Escolher a expressao antes de gerar a frase.
-          // A inferencia continua exatamente igual.
-          eye_state = eye_state_from_prompt(input_buf);
-
-          // Adicionar espaco apos o marcador (como o generate.py faz)
-          char prompt[34];
-          snprintf(prompt, sizeof(prompt), "%s ", input_buf);
-          Serial.printf("\nGerando para: %s\n", input_buf);
-          gerar(prompt);
-        } else {
-          Serial.println("Marcador invalido. Use: <start>, <obstacle>, etc.");
-        }
+        processarMarcador(input_buf);
         input_len = 0;
       }
     } else if (input_len < 31) {
       input_buf[input_len++] = c;
+    }
+  }
+
+  // ----------------------------------------------------------
+  // [NOVO] FONTE 2: UART do corpo (WROOM-32 enviando marcadores)
+  // Mesma logica da Serial USB, mas lendo da porta "corpo".
+  // ----------------------------------------------------------
+  while (corpo.available()) {
+    char c = corpo.read();
+    if (c == '\n' || c == '\r') {
+      if (corpo_len > 0) {
+        corpo_buf[corpo_len] = '\0';
+        Serial.printf("[CORPO] recebido: %s\n", corpo_buf);
+        processarMarcador(corpo_buf);
+        corpo_len = 0;
+      }
+    } else if (corpo_len < 31) {
+      corpo_buf[corpo_len++] = c;
     }
   }
 }
