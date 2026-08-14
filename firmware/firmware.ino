@@ -661,7 +661,7 @@ static int  input_len = 0;
 
 // Velocidade da "fala".
 // Menor = mais rapido; maior = mais lento.
-#define SPEAK_DELAY_MS 90
+#define SPEAK_DELAY_MS 450
 
 // Estado visual da fala.
 static char speak_lines[MAX_LINHAS][DISPLAY_COLS + 1];
@@ -740,7 +740,9 @@ static void speak_add_word(const char *word) {
 }
 
 // Desenha os olhos e as ultimas 3 linhas acumuladas.
-static void speak_draw() {
+// O scroll vertical usa um pequeno deslocamento em pixels para evitar
+// a troca brusca de uma tela inteira para outra.
+static void speak_draw(int scroll_y = 0) {
   display.clearBuffer();
   display.setFont(u8g2_font_6x10_tf);
 
@@ -753,7 +755,7 @@ static void speak_draw() {
   if (first < 0)
     first = 0;
 
-  int y = 42;
+  int y = 42 - scroll_y;
 
   for (int i = first; i < speak_line_count; i++) {
     display.drawStr(0, y, speak_lines[i]);
@@ -763,11 +765,48 @@ static void speak_draw() {
   display.sendBuffer();
 }
 
+// Faz uma transicao suave quando uma nova linha entra.
+// A linha nova sobe enquanto as anteriores acompanham o movimento.
+static void speak_smooth_scroll() {
+  // A linha nova normalmente entra quando passamos da 3a linha.
+  // 10 pixels = altura aproximada da fonte 6x10.
+  for (int offset = 1; offset <= 10; offset++) {
+    speak_draw(offset);
+    delay(18);
+  }
+
+  speak_draw(0);
+}
+
+// Pausa natural depois da palavra, considerando a pontuacao.
+// A pausa base de 450 ms continua valendo para toda palavra.
+static void speak_natural_pause(const char *word) {
+  int len = strlen(word);
+
+  if (len <= 0) {
+    delay(SPEAK_DELAY_MS);
+    return;
+  }
+
+  char last = word[len - 1];
+
+  // Pausas adicionais para dar ritmo de fala.
+  if (last == ',') {
+    delay(SPEAK_DELAY_MS + 250);
+  } else if (last == ';' || last == ':') {
+    delay(SPEAK_DELAY_MS + 300);
+  } else if (last == '.' || last == '!' || last == '?') {
+    delay(SPEAK_DELAY_MS + 650);
+  } else {
+    delay(SPEAK_DELAY_MS);
+  }
+}
+
 // Mostra uma frase progressivamente, palavra por palavra.
-// Quando as 3 linhas ficam cheias, o texto sobe naturalmente.
+// Quando as 3 linhas ficam cheias, o texto sobe suavemente.
 void display_speak(const char *frase) {
   speak_clear();
-  speak_draw();
+  speak_draw(0);
 
   const char *p = frase;
 
@@ -788,10 +827,25 @@ void display_speak(const char *frase) {
 
     word[n] = '\0';
 
-    speak_add_word(word);
-    speak_draw();
+    // Guardamos quantas linhas existiam antes.
+    int old_line_count = speak_line_count;
 
-    delay(SPEAK_DELAY_MS);
+    speak_add_word(word);
+
+    // Se nasceu uma nova linha e ja precisamos rolar a tela,
+    // faz a transicao pixel a pixel.
+    bool needs_scroll =
+      (speak_line_count > DISPLAY_ROWS &&
+       speak_line_count > old_line_count &&
+       (speak_line_count - DISPLAY_ROWS) > (old_line_count - DISPLAY_ROWS));
+
+    if (needs_scroll) {
+      speak_smooth_scroll();
+    } else {
+      speak_draw(0);
+    }
+
+    speak_natural_pause(word);
   }
 }
 
