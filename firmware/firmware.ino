@@ -29,6 +29,7 @@
 #include "esp_partition.h"    // acesso as particoes da flash
 #include "esp_heap_caps.h"    // alocacao de memoria em PSRAM/SRAM
 #include <math.h>             // expf(), sqrtf()
+#include <string.h>           // memset(), strstr(), strncmp()
 
 // ------------------------------------------------------------
 // Display OLED SH1106 SPI (pinos confirmados no seu hardware)
@@ -311,6 +312,132 @@ static void forward(int token, int pos) {
 }
 
 
+
+// ============================================================
+// OLHOS DO NANO-GRUMP
+// ============================================================
+// A parte de IA/inferencia nao usa nada daqui.
+// Os olhos sao apenas uma camada visual do OLED.
+//
+// Area reservada:
+//   topo: 0..29   -> olhos
+//   texto: 34..63 -> ate 3 linhas
+//
+// Cada marcador escolhe uma expressao diferente.
+// ============================================================
+
+// Estados dos olhos. Usamos int de propósito para evitar que o
+// pré-processador do Arduino gere protótipos antes desta declaração.
+#define OLHOS_NORMAL      0
+#define OLHOS_FELIZ       1
+#define OLHOS_CURIOSO     2
+#define OLHOS_ALERTA      3
+#define OLHOS_ESQUERDA    4
+#define OLHOS_DIREITA     5
+#define OLHOS_PREOCUPADO  6
+#define OLHOS_TRAVADO     7
+#define OLHOS_ALIVIADO    8
+
+static int eye_state = OLHOS_NORMAL;
+
+// Desenha um olho circular simples.
+// cx/cy = centro; raio = tamanho.
+static void olho_circular(int cx, int cy, int raio, int pupila_dx = 0) {
+  display.drawCircle(cx, cy, raio);
+  display.drawDisc(cx + pupila_dx, cy, 2);
+}
+
+// Desenha os dois olhos de acordo com o estado atual.
+static void draw_eyes(int state) {
+  const int L = 38;
+  const int R = 90;
+  const int CY = 14;
+
+  // Expressao padrao: dois olhos redondos.
+  if (state == OLHOS_NORMAL) {
+    olho_circular(L, CY, 7, 0);
+    olho_circular(R, CY, 7, 0);
+    return;
+  }
+
+  // Feliz: olhos "sorrindo".
+  if (state == OLHOS_FELIZ || state == OLHOS_ALIVIADO) {
+    display.drawLine(L - 7, CY + 2, L, CY - 3);
+    display.drawLine(L,     CY - 3, L + 7, CY + 2);
+    display.drawLine(R - 7, CY + 2, R, CY - 3);
+    display.drawLine(R,     CY - 3, R + 7, CY + 2);
+
+    // Pequeno brilho/sorriso visual embaixo dos olhos.
+    display.drawPixel(64, 27);
+    return;
+  }
+
+  // Curioso: olhos grandes, pupilas deslocadas para cima.
+  if (state == OLHOS_CURIOSO) {
+    display.drawCircle(L, CY, 8);
+    display.drawDisc(L + 2, CY - 2, 2);
+    display.drawCircle(R, CY, 8);
+    display.drawDisc(R + 2, CY - 2, 2);
+    return;
+  }
+
+  // Alerta: olhos grandes e pupilas centradas.
+  if (state == OLHOS_ALERTA) {
+    display.drawCircle(L, CY, 9);
+    display.drawDisc(L, CY, 3);
+    display.drawCircle(R, CY, 9);
+    display.drawDisc(R, CY, 3);
+    return;
+  }
+
+  // Olhando para a esquerda.
+  if (state == OLHOS_ESQUERDA) {
+    olho_circular(L, CY, 7, -3);
+    olho_circular(R, CY, 7, -3);
+    return;
+  }
+
+  // Olhando para a direita.
+  if (state == OLHOS_DIREITA) {
+    olho_circular(L, CY, 7, 3);
+    olho_circular(R, CY, 7, 3);
+    return;
+  }
+
+  // Preocupado: sobrancelhas inclinadas para o centro.
+  if (state == OLHOS_PREOCUPADO) {
+    olho_circular(L, CY + 1, 7, 0);
+    olho_circular(R, CY + 1, 7, 0);
+
+    display.drawLine(L - 8, 4, L + 5, 1);
+    display.drawLine(R - 5, 1, R + 8, 4);
+    return;
+  }
+
+  // Travado/frustrado: olhos semicerrados.
+  if (state == OLHOS_TRAVADO) {
+    display.drawLine(L - 8, CY, L + 8, CY);
+    display.drawLine(R - 8, CY, R + 8, CY);
+    display.drawLine(L - 6, 5, L + 6, 5);
+    display.drawLine(R - 6, 5, R + 6, 5);
+    return;
+  }
+}
+
+// Escolhe a expressao a partir do marcador recebido.
+// Nao altera o texto nem a inferencia.
+static int eye_state_from_prompt(const char *prompt) {
+  if (strstr(prompt, "<start>"))       return OLHOS_FELIZ;
+  if (strstr(prompt, "<explore>"))     return OLHOS_CURIOSO;
+  if (strstr(prompt, "<obstacle>"))    return OLHOS_ALERTA;
+  if (strstr(prompt, "<turn_left>"))   return OLHOS_ESQUERDA;
+  if (strstr(prompt, "<turn_right>"))  return OLHOS_DIREITA;
+  if (strstr(prompt, "<backup>"))      return OLHOS_PREOCUPADO;
+  if (strstr(prompt, "<stuck>"))       return OLHOS_TRAVADO;
+  if (strstr(prompt, "<clear>"))       return OLHOS_ALIVIADO;
+  return OLHOS_NORMAL;
+}
+
 // ============================================================
 // PARTE 4 — GERACAO DE TEXTO (top-k + temperatura)
 // ============================================================
@@ -495,8 +622,10 @@ void setup() {
   display.begin();
   display.clearBuffer();
   display.setFont(u8g2_font_6x10_tf);
-  display.drawStr(0, 12, "nano-grump v2");
-  display.drawStr(0, 26, "aguardando...");
+  draw_eyes(OLHOS_NORMAL);
+  display.drawHLine(0, 31, 128);
+  display.drawStr(0, 42, "nano-grump v2");
+  display.drawStr(0, 52, "aguardando...");
   display.sendBuffer();
 
   Serial.println("Display OK.");
@@ -527,13 +656,11 @@ static int  input_len = 0;
 // ------------------------------------------------------------
 
 #define DISPLAY_COLS   21    // caracteres por linha
-#define DISPLAY_ROWS   5     // linhas visiveis na tela
+#define DISPLAY_ROWS   3     // 3 linhas abaixo dos olhos
 #define MAX_LINHAS     16    // maximo de linhas que uma frase pode ter
 
 void display_render(const char *frase) {
   // 1. Quebrar a frase em linhas, respeitando as palavras.
-  //    Percorremos palavra por palavra; se a proxima palavra nao
-  //    couber na linha atual, comecamos uma nova linha.
   static char linhas[MAX_LINHAS][DISPLAY_COLS + 1];
   int n_linhas = 0;
   int col = 0;
@@ -541,12 +668,16 @@ void display_render(const char *frase) {
 
   int i = 0;
   while (frase[i] != '\0' && n_linhas < MAX_LINHAS) {
-    // Encontrar o fim da proxima palavra
+    // Ignorar espacos extras no inicio.
+    while (frase[i] == ' ') i++;
+    if (frase[i] == '\0') break;
+
+    // Encontrar o fim da proxima palavra.
     int ini = i;
     while (frase[i] != '\0' && frase[i] != ' ') i++;
     int tam_palavra = i - ini;
 
-    // Se a palavra sozinha e maior que a linha, quebra ela na forca
+    // Se a palavra sozinha for maior que a linha, quebra na forca.
     if (tam_palavra > DISPLAY_COLS) {
       for (int j = ini; j < i; j++) {
         if (col >= DISPLAY_COLS) {
@@ -557,41 +688,50 @@ void display_render(const char *frase) {
         linhas[n_linhas][col++] = frase[j];
       }
     } else {
-      // Cabe a palavra na linha atual? (+1 pelo espaco, se ja tem texto)
       int precisa = tam_palavra + (col > 0 ? 1 : 0);
+
       if (col + precisa > DISPLAY_COLS) {
-        // Nao cabe: fecha a linha atual e comeca outra
         linhas[n_linhas][col] = '\0';
         if (++n_linhas >= MAX_LINHAS) break;
         col = 0;
       }
-      // Adiciona espaco separador (se nao for inicio de linha)
+
       if (col > 0) linhas[n_linhas][col++] = ' ';
-      // Copia a palavra
-      for (int j = ini; j < i; j++) linhas[n_linhas][col++] = frase[j];
+
+      for (int j = ini; j < i; j++)
+        linhas[n_linhas][col++] = frase[j];
     }
 
-    // Pular o espaco que separa as palavras
     if (frase[i] == ' ') i++;
   }
-  // Fecha a ultima linha
-  if (n_linhas < MAX_LINHAS) {
+
+  if (n_linhas < MAX_LINHAS && col > 0) {
     linhas[n_linhas][col] = '\0';
     n_linhas++;
   }
 
-  // 2. Decidir quais linhas mostrar (scroll: as ultimas DISPLAY_ROWS)
+  // 2. Mostrar as ultimas 3 linhas quando a frase for maior que a tela.
   int primeira = 0;
-  if (n_linhas > DISPLAY_ROWS) primeira = n_linhas - DISPLAY_ROWS;
+  if (n_linhas > DISPLAY_ROWS)
+    primeira = n_linhas - DISPLAY_ROWS;
 
-  // 3. Desenhar na tela
+  // 3. Desenhar olhos + texto.
   display.clearBuffer();
   display.setFont(u8g2_font_6x10_tf);
-  int y = 10;
+
+  // Parte superior: expressao do nano-grump.
+  draw_eyes(eye_state);
+
+  // Linha separadora entre olhos e texto.
+  display.drawHLine(0, 31, 128);
+
+  // Parte inferior: texto.
+  int y = 42;
   for (int l = primeira; l < n_linhas; l++) {
     display.drawStr(0, y, linhas[l]);
-    y += 12;
+    y += 10;
   }
+
   display.sendBuffer();
 }
 
@@ -604,6 +744,10 @@ void loop() {
         input_buf[input_len] = '\0';
         // Verificar se e um marcador valido
         if (strncmp(input_buf, "<", 1) == 0) {
+          // Escolher a expressao antes de gerar a frase.
+          // A inferencia continua exatamente igual.
+          eye_state = eye_state_from_prompt(input_buf);
+
           // Adicionar espaco apos o marcador (como o generate.py faz)
           char prompt[34];
           snprintf(prompt, sizeof(prompt), "%s ", input_buf);
