@@ -354,6 +354,15 @@ static void gerar(const char *prompt) {
   }
 
   // Gerar caracteres um por um (autorregressivo)
+  // [ADICIONADO] buffer que acumula a frase inteira gerada,
+  // para renderizar no display de uma vez (com quebra por palavra).
+  // Comeca com o proprio prompt (o marcador), para ele aparecer junto.
+  char frase_buf[192];
+  int  frase_len = 0;
+  for (int i = 0; prompt[i] != '\0' && frase_len < (int)sizeof(frase_buf)-1; i++)
+    frase_buf[frase_len++] = prompt[i];
+  frase_buf[frase_len] = '\0';
+
   Serial.print(prompt);
   for (int step = 0; step < MAX_TOKENS && pos < BLOCK_SIZE; step++) {
 
@@ -388,17 +397,25 @@ static void gerar(const char *prompt) {
     // Se gerou '\n', a frase acabou
     if (next_token == TOKEN_NEWLINE) break;
 
-    // Imprimir o caractere gerado
+    // Imprimir o caractere gerado na Serial
     char c = VOCAB[next_token];
     Serial.print(c);
-    display_char(c);   // funcao que vamos implementar no Passo 4
+
+    // [ALTERADO] em vez de mandar char a char pro display (o que
+    // causava quebra no meio da palavra), acumulamos a frase inteira
+    // num buffer e renderizamos de uma vez no fim, com quebra por
+    // palavra e scroll. Ver display_render() abaixo.
+    if (frase_len < (int)sizeof(frase_buf) - 1) {
+      frase_buf[frase_len++] = c;
+      frase_buf[frase_len]   = '\0';
+    }
 
     // Avancar o modelo com o token gerado
     forward(next_token, pos++);
   }
 
   Serial.println();
-  display_flush();   // funcao que vamos implementar no Passo 4
+  display_render(frase_buf);   // renderiza a frase completa com scroll
 }
 
 
@@ -493,46 +510,89 @@ void setup() {
 static char input_buf[32];
 static int  input_len = 0;
 
-// Variaveis para exibir a frase no display linha por linha
-static char display_line1[22] = "";
-static char display_line2[22] = "";
-static char display_line3[22] = "";
-static int  display_col = 0;
-static int  display_row = 0;
+// ------------------------------------------------------------
+// [REESCRITO] display_render — renderiza a frase inteira no OLED
+// com QUEBRA POR PALAVRA e SCROLL.
+//
+// Antes: display_char/display_flush escreviam char a char em 3
+// linhas fixas, quebrando no meio das palavras e perdendo texto
+// quando passava de 3 linhas.
+//
+// Agora: recebe a frase completa, quebra em linhas SEM cortar
+// palavras, e se passar de 5 linhas, rola (mostra as ultimas 5).
+//
+// Medidas do display 128x64 com a fonte 6x10:
+//   largura : 128 / 6 = 21 caracteres por linha
+//   altura  : 64 / 12  = 5 linhas visiveis
+// ------------------------------------------------------------
 
-// Exibe um caractere no display, quebra linha quando necessario
-void display_char(char c) {
-  if (display_col == 0 && display_row == 0) {
-    memset(display_line1, 0, sizeof(display_line1));
-    memset(display_line2, 0, sizeof(display_line2));
-    memset(display_line3, 0, sizeof(display_line3));
-  }
-  char *linha = (display_row == 0) ? display_line1
-              : (display_row == 1) ? display_line2
-                                   : display_line3;
-  if (display_col < 21) {
-    linha[display_col++] = c;
-    linha[display_col]   = '\0';
-  } else {
-    display_col = 0;
-    display_row = (display_row < 2) ? display_row + 1 : 2;
-    linha = (display_row == 1) ? display_line2 : display_line3;
-    linha[display_col++] = c;
-    linha[display_col]   = '\0';
-  }
-}
+#define DISPLAY_COLS   21    // caracteres por linha
+#define DISPLAY_ROWS   5     // linhas visiveis na tela
+#define MAX_LINHAS     16    // maximo de linhas que uma frase pode ter
 
-// Envia o conteudo acumulado para o display de uma vez
-void display_flush() {
+void display_render(const char *frase) {
+  // 1. Quebrar a frase em linhas, respeitando as palavras.
+  //    Percorremos palavra por palavra; se a proxima palavra nao
+  //    couber na linha atual, comecamos uma nova linha.
+  static char linhas[MAX_LINHAS][DISPLAY_COLS + 1];
+  int n_linhas = 0;
+  int col = 0;
+  linhas[0][0] = '\0';
+
+  int i = 0;
+  while (frase[i] != '\0' && n_linhas < MAX_LINHAS) {
+    // Encontrar o fim da proxima palavra
+    int ini = i;
+    while (frase[i] != '\0' && frase[i] != ' ') i++;
+    int tam_palavra = i - ini;
+
+    // Se a palavra sozinha e maior que a linha, quebra ela na forca
+    if (tam_palavra > DISPLAY_COLS) {
+      for (int j = ini; j < i; j++) {
+        if (col >= DISPLAY_COLS) {
+          linhas[n_linhas][col] = '\0';
+          if (++n_linhas >= MAX_LINHAS) break;
+          col = 0;
+        }
+        linhas[n_linhas][col++] = frase[j];
+      }
+    } else {
+      // Cabe a palavra na linha atual? (+1 pelo espaco, se ja tem texto)
+      int precisa = tam_palavra + (col > 0 ? 1 : 0);
+      if (col + precisa > DISPLAY_COLS) {
+        // Nao cabe: fecha a linha atual e comeca outra
+        linhas[n_linhas][col] = '\0';
+        if (++n_linhas >= MAX_LINHAS) break;
+        col = 0;
+      }
+      // Adiciona espaco separador (se nao for inicio de linha)
+      if (col > 0) linhas[n_linhas][col++] = ' ';
+      // Copia a palavra
+      for (int j = ini; j < i; j++) linhas[n_linhas][col++] = frase[j];
+    }
+
+    // Pular o espaco que separa as palavras
+    if (frase[i] == ' ') i++;
+  }
+  // Fecha a ultima linha
+  if (n_linhas < MAX_LINHAS) {
+    linhas[n_linhas][col] = '\0';
+    n_linhas++;
+  }
+
+  // 2. Decidir quais linhas mostrar (scroll: as ultimas DISPLAY_ROWS)
+  int primeira = 0;
+  if (n_linhas > DISPLAY_ROWS) primeira = n_linhas - DISPLAY_ROWS;
+
+  // 3. Desenhar na tela
   display.clearBuffer();
   display.setFont(u8g2_font_6x10_tf);
-  display.drawStr(0, 12, display_line1);
-  display.drawStr(0, 26, display_line2);
-  display.drawStr(0, 40, display_line3);
+  int y = 10;
+  for (int l = primeira; l < n_linhas; l++) {
+    display.drawStr(0, y, linhas[l]);
+    y += 12;
+  }
   display.sendBuffer();
-  // Resetar para a proxima frase
-  display_col = 0;
-  display_row = 0;
 }
 
 void loop() {
