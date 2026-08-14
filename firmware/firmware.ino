@@ -655,84 +655,150 @@ static int  input_len = 0;
 //   altura  : 64 / 12  = 5 linhas visiveis
 // ------------------------------------------------------------
 
-#define DISPLAY_COLS   21    // caracteres por linha
+#define DISPLAY_COLS   21    // largura aproximada em caracteres com a fonte 6x10
 #define DISPLAY_ROWS   3     // 3 linhas abaixo dos olhos
-#define MAX_LINHAS     16    // maximo de linhas que uma frase pode ter
+#define MAX_LINHAS     32    // buffer visual para frases longas
 
-void display_render(const char *frase) {
-  // 1. Quebrar a frase em linhas, respeitando as palavras.
-  static char linhas[MAX_LINHAS][DISPLAY_COLS + 1];
-  int n_linhas = 0;
-  int col = 0;
-  linhas[0][0] = '\0';
+// Velocidade da "fala".
+// Menor = mais rapido; maior = mais lento.
+#define SPEAK_DELAY_MS 90
 
-  int i = 0;
-  while (frase[i] != '\0' && n_linhas < MAX_LINHAS) {
-    // Ignorar espacos extras no inicio.
-    while (frase[i] == ' ') i++;
-    if (frase[i] == '\0') break;
+// Estado visual da fala.
+static char speak_lines[MAX_LINHAS][DISPLAY_COLS + 1];
+static int speak_line_count = 0;
+static int speak_current_line = 0;
 
-    // Encontrar o fim da proxima palavra.
-    int ini = i;
-    while (frase[i] != '\0' && frase[i] != ' ') i++;
-    int tam_palavra = i - ini;
+// Limpa o buffer de texto da fala.
+static void speak_clear() {
+  for (int i = 0; i < MAX_LINHAS; i++)
+    speak_lines[i][0] = '\0';
 
-    // Se a palavra sozinha for maior que a linha, quebra na forca.
-    if (tam_palavra > DISPLAY_COLS) {
-      for (int j = ini; j < i; j++) {
-        if (col >= DISPLAY_COLS) {
-          linhas[n_linhas][col] = '\0';
-          if (++n_linhas >= MAX_LINHAS) break;
-          col = 0;
-        }
-        linhas[n_linhas][col++] = frase[j];
-      }
-    } else {
-      int precisa = tam_palavra + (col > 0 ? 1 : 0);
+  speak_line_count = 1;
+  speak_current_line = 0;
+}
 
-      if (col + precisa > DISPLAY_COLS) {
-        linhas[n_linhas][col] = '\0';
-        if (++n_linhas >= MAX_LINHAS) break;
-        col = 0;
-      }
+// Adiciona uma palavra ao buffer, quebrando por palavras.
+// O buffer pode ter muitas linhas; o display mostra somente as ultimas 3.
+static void speak_add_word(const char *word) {
+  if (word == nullptr || word[0] == '\0')
+    return;
 
-      if (col > 0) linhas[n_linhas][col++] = ' ';
+  int len = strlen(word);
 
-      for (int j = ini; j < i; j++)
-        linhas[n_linhas][col++] = frase[j];
+  // Palavra maior que a largura: quebra em pedacos.
+  while (len > DISPLAY_COLS) {
+    if (speak_current_line >= MAX_LINHAS)
+      return;
+
+    int available = DISPLAY_COLS - (int)strlen(speak_lines[speak_current_line]);
+
+    // Se a linha atual ja tem texto, termina-a antes de quebrar a palavra.
+    if (available > 0 && strlen(speak_lines[speak_current_line]) > 0) {
+      speak_current_line++;
+      if (speak_current_line >= MAX_LINHAS)
+        return;
+      if (speak_current_line + 1 > speak_line_count) speak_line_count = speak_current_line + 1;
     }
 
-    if (frase[i] == ' ') i++;
+    strncpy(speak_lines[speak_current_line], word, DISPLAY_COLS);
+    speak_lines[speak_current_line][DISPLAY_COLS] = '\0';
+
+    word += DISPLAY_COLS;
+    len -= DISPLAY_COLS;
+
+    speak_current_line++;
+    if (speak_current_line >= MAX_LINHAS)
+      return;
+
+    if (speak_current_line + 1 > speak_line_count) speak_line_count = speak_current_line + 1;
   }
 
-  if (n_linhas < MAX_LINHAS && col > 0) {
-    linhas[n_linhas][col] = '\0';
-    n_linhas++;
+  if (len <= 0)
+    return;
+
+  int current_len = strlen(speak_lines[speak_current_line]);
+
+  // Se a palavra nao couber, cria uma nova linha.
+  if (current_len > 0 && current_len + 1 + len > DISPLAY_COLS) {
+    speak_current_line++;
+
+    if (speak_current_line >= MAX_LINHAS)
+      return;
+
+    speak_lines[speak_current_line][0] = '\0';
+    if (speak_current_line + 1 > speak_line_count) speak_line_count = speak_current_line + 1;
+    current_len = 0;
   }
 
-  // 2. Mostrar as ultimas 3 linhas quando a frase for maior que a tela.
-  int primeira = 0;
-  if (n_linhas > DISPLAY_ROWS)
-    primeira = n_linhas - DISPLAY_ROWS;
+  if (current_len > 0) {
+    speak_lines[speak_current_line][current_len++] = ' ';
+    speak_lines[speak_current_line][current_len] = '\0';
+  }
 
-  // 3. Desenhar olhos + texto.
+  strncat(speak_lines[speak_current_line], word,
+          DISPLAY_COLS - strlen(speak_lines[speak_current_line]));
+}
+
+// Desenha os olhos e as ultimas 3 linhas acumuladas.
+static void speak_draw() {
   display.clearBuffer();
   display.setFont(u8g2_font_6x10_tf);
 
-  // Parte superior: expressao do nano-grump.
   draw_eyes(eye_state);
 
-  // Linha separadora entre olhos e texto.
+  // Separador entre olhos e texto.
   display.drawHLine(0, 31, 128);
 
-  // Parte inferior: texto.
+  int first = speak_line_count - DISPLAY_ROWS;
+  if (first < 0)
+    first = 0;
+
   int y = 42;
-  for (int l = primeira; l < n_linhas; l++) {
-    display.drawStr(0, y, linhas[l]);
+
+  for (int i = first; i < speak_line_count; i++) {
+    display.drawStr(0, y, speak_lines[i]);
     y += 10;
   }
 
   display.sendBuffer();
+}
+
+// Mostra uma frase progressivamente, palavra por palavra.
+// Quando as 3 linhas ficam cheias, o texto sobe naturalmente.
+void display_speak(const char *frase) {
+  speak_clear();
+  speak_draw();
+
+  const char *p = frase;
+
+  while (*p != '\0') {
+    // Pula espacos.
+    while (*p == ' ')
+      p++;
+
+    if (*p == '\0')
+      break;
+
+    char word[64];
+    int n = 0;
+
+    while (*p != '\0' && *p != ' ' && n < (int)sizeof(word) - 1) {
+      word[n++] = *p++;
+    }
+
+    word[n] = '\0';
+
+    speak_add_word(word);
+    speak_draw();
+
+    delay(SPEAK_DELAY_MS);
+  }
+}
+
+// Mantemos display_render() como compatibilidade com o restante do firmware.
+// Agora ele usa o modo de fala progressiva.
+void display_render(const char *frase) {
+  display_speak(frase);
 }
 
 void loop() {
