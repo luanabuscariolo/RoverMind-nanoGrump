@@ -45,7 +45,7 @@ _vocab_data = json.loads(_caminho_vocab.read_text(encoding="utf-8"))
 vocab_size = _vocab_data["vocab_size"]     # [ALTERADO] antes: vocab_size = 59
 
 n_embd     = 64     # [ALTERADO] 32 -> 64  (tamanho do vetor de cada token)
-block_size = 64     # [ALTERADO] 32 -> 64  (janela de contexto)
+block_size = 128     # [ALTERADO] 32 -> 64  (janela de contexto)
 n_layer    = 4      # [ALTERADO] 3  -> 4   (numero de blocos empilhados)
 n_heads    = 4      # [ADICIONADO] numero de cabecas de atencao
 

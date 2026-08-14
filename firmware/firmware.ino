@@ -54,7 +54,7 @@ U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI
 // Serao confirmados ao ler o cabecalho do .bin
 #define VOCAB_SIZE  59
 #define N_EMBD      64
-#define BLOCK_SIZE  64
+#define BLOCK_SIZE  128     // [ALTERADO] 64 -> 128 (cabe frases longas ate 107 chars)
 #define N_LAYER     4
 #define N_HEADS     4
 #define HEAD_SIZE   (N_EMBD / N_HEADS)   // 64 / 4 = 16
@@ -139,15 +139,36 @@ static Pesos w;
 // em C. A matematica e identica — so o idioma mudou.
 
 // ------------------------------------------------------------
-// rmsnorm: normaliza um vetor (como o LayerNorm do model.py,
-// versao simplificada sem media — so divide pelo RMS).
-// RMS = raiz da media dos quadrados.
+// layernorm: normaliza um vetor EXATAMENTE como o nn.LayerNorm
+// do model.py. Diferente do RMSNorm, o LayerNorm:
+//   1. subtrai a MEDIA (centraliza em zero)
+//   2. divide pelo desvio padrao
+//   3. multiplica pelo peso (w) e SOMA o bias (b)
+//
+// [CORRIGIDO] antes era rmsnorm (sem media, sem bias). O modelo
+// foi treinado com LayerNorm completo, entao o firmware precisa
+// usar a mesma normalizacao — senao cada vetor sai distorcido e
+// o erro se acumula, gerando palavras tortas.
 // ------------------------------------------------------------
-static void rmsnorm(float *out, const float *x, const float *w, int n) {
-  float ss = 0.0f;
-  for (int i = 0; i < n; i++) ss += x[i] * x[i];
-  ss = 1.0f / sqrtf(ss / n + 1e-5f);
-  for (int i = 0; i < n; i++) out[i] = w[i] * (ss * x[i]);
+static void layernorm(float *out, const float *x,
+                      const float *w, const float *b, int n) {
+  // 1. media
+  float media = 0.0f;
+  for (int i = 0; i < n; i++) media += x[i];
+  media /= n;
+
+  // 2. variancia (media dos desvios ao quadrado)
+  float var = 0.0f;
+  for (int i = 0; i < n; i++) {
+    float d = x[i] - media;
+    var += d * d;
+  }
+  var /= n;
+
+  // 3. normalizar, escalar (w) e deslocar (b)
+  float inv_std = 1.0f / sqrtf(var + 1e-5f);
+  for (int i = 0; i < n; i++)
+    out[i] = w[i] * ((x[i] - media) * inv_std) + b[i];
 }
 
 // ------------------------------------------------------------
@@ -207,10 +228,8 @@ static void forward(int token, int pos) {
     // --- SUB-CAMADA 1: ATENCAO MULTI-CABECA ---
 
     // 2a. LayerNorm antes da atencao (pre-norm, como no model.py)
-    rmsnorm(xb, x, b->ln1_w, N_EMBD);
-    // OBS: nosso layernorm nao tem bias — o export.py exportou
-    // o bias mas aqui usamos RMSNorm simplificado (sem bias).
-    // A diferenca e minima na pratica para este modelo.
+    // [CORRIGIDO] agora usa layernorm completo (com bias ln1_b)
+    layernorm(xb, x, b->ln1_w, b->ln1_b, N_EMBD);
 
     // 2b. Calcular Q, K, V (as tres "vistas" de cada token)
     matmul(q,     xb, b->q_w, N_EMBD, N_EMBD);
@@ -270,7 +289,8 @@ static void forward(int token, int pos) {
     // --- SUB-CAMADA 2: FFN (demo 4) ---
 
     // 2f. LayerNorm antes da FFN
-    rmsnorm(xb, x, b->ln2_w, N_EMBD);
+    // [CORRIGIDO] agora usa layernorm completo (com bias ln2_b)
+    layernorm(xb, x, b->ln2_w, b->ln2_b, N_EMBD);
 
     // 2g. Expandir: 64 -> 256
     matmul(h, xb, b->ffn1_w, FFN_DIM, N_EMBD);
@@ -285,7 +305,8 @@ static void forward(int token, int pos) {
   }
 
   // 3. LAYERNORM FINAL + CAMADA DE SAIDA
-  rmsnorm(xb, x, w.ln_final_w, N_EMBD);
+  // [CORRIGIDO] agora usa layernorm completo (com bias ln_final_b)
+  layernorm(xb, x, w.ln_final_w, w.ln_final_b, N_EMBD);
   matmul(logits, xb, w.saida_w, VOCAB_SIZE, N_EMBD);
 }
 
