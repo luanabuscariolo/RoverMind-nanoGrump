@@ -1,77 +1,68 @@
-# 🤖 RoverMind — Nano-Rabugento
+# 🤖 RoverMind — nano-grump
 
-> Um mini-GPT construído do zero que dá voz sarcástica e preguiçosa ao cérebro de
-> um robô autônomo. Cada situação do robô vira uma frase com personalidade.
+> Um robô autônomo de dois cérebros que anda sozinho, desvia de obstáculos e
+> **comenta cada situação com uma personalidade sarcástica** — gerada por um
+> mini-GPT treinado do zero e rodando em C num microcontrolador.
 
-**nano-grump** é o "cérebro de linguagem" de um robô de dois cérebros: um corpo
-(ESP32-WROOM-32) que navega e desvia de obstáculos, e um cérebro (ESP32-S3) que
-comenta cada situação com o humor de quem preferia estar carregando a bateria.
-
-Este repositório contém o **cérebro**: um modelo de linguagem de nível de
-caractere, treinado do zero em PyTorch, construído peça por peça com finalidade
-didática — entender cada camada de um Transformer, não apenas usá-lo.
+O **corpo** (ESP32-WROOM-32) navega e lê sensores. O **cérebro** (ESP32-S3) roda o
+**nano-grump**, um modelo de linguagem de nível de caractere que dá voz preguiçosa e
+rabugenta ao robô. O corpo detecta uma situação, envia um marcador ao cérebro, e o
+cérebro responde com uma frase exibida no display OLED — com olhos expressivos e
+fala progressiva.
 
 ```
 <obstacle>   → "A barrier again. Alright."
-<backup>     → "I walked right into that one. Retreating. Beep beep."
-<explore>    → "Rolling along. I have no idea where I'm going."
+<backup>     → "Reversing out. Not defeat, just a tactical nap in motion."
 <stuck>      → "I'm boxed in. This was absolutely intentional."
+<clear>      → "Free to move. Enjoy it while it lasts."
 ```
+
+Tudo construído **do zero, sem caixas pretas** — do tokenizer à atenção multi-cabeça,
+do dataset ao firmware de inferência em C.
 
 ---
 
-## 🎯 Para que serve
-
-O robô físico detecta situações com seus sensores (obstáculo à frente, caminho
-livre, preso num canto, etc.) e as representa por **marcadores**: `<obstacle>`,
-`<clear>`, `<stuck>`… O nano-grump recebe um marcador e **gera uma frase** com a
-personalidade do robô para aquela situação, que aparece no display e nos LEDs.
-
-A separação é intencional:
+## 🎯 Arquitetura de dois cérebros
 
 ```
-        ROBÔ
-          │
-   ┌──────┴───────┐
-   │              │
-ESP32-WROOM    ESP32-S3
-  CORPO         CÉREBRO
-   │              │
-sensores       nano-grump
-motores        (linguagem)
-navegação      personalidade
-   │              │
-   └──────┬───────┘
-      comunicação
-   (marcador → frase)
+                    ROBÔ
+                      │
+          ┌───────────┴────────────┐
+          │                        │
+   ESP32-WROOM-32              ESP32-S3
+      CORPO                     CÉREBRO
+          │                        │
+   HC-SR04 (sensor)          nano-grump (LLM)
+   SG90 (servo)              display OLED SH1106
+   L298N (motores)           olhos + fala
+   navegação                 personalidade
+          │                        │
+          └────────── UART ────────┘
+        marcador de situação → frase sarcástica
 ```
 
-O corpo cuida de navegação e motores. O cérebro cuida de linguagem e
-personalidade. A IA **não** controla os motores diretamente — ela apenas dá voz ao
-que o robô está fazendo.
+O corpo cuida de navegação e motores. O cérebro cuida de linguagem e personalidade.
+A IA **não** controla os motores — ela só dá voz ao que o robô faz. A comunicação é
+por UART (o corpo envia o marcador, o cérebro gera e exibe).
 
 ---
 
-## 🧠 O que é o modelo
+## 🧠 O modelo (nano-grump v2)
 
-Um mini-GPT decoder-only, nível de caractere, montado do zero:
+Um mini-GPT decoder-only, nível de caractere, montado peça por peça:
 
 | Item | Valor |
 |---|---|
-| Parâmetros | 211.003 |
+| Parâmetros | ~215 mil |
 | Vocabulário | 59 caracteres |
-| Contexto | 64 caracteres |
+| Contexto | 128 caracteres |
 | Camadas | 4 blocos |
 | Atenção | 4 cabeças (multi-head) |
 | Embedding | 64 dimensões |
+| Melhor val loss | 1.40 |
 | Framework | PyTorch + CUDA |
 
-O modelo aprende letra por letra a "falar como o robô". Todo o pipeline — do
-tokenizer à geração — foi construído componente por componente, com demos
-isolados para cada peça (embedding, posição, atenção, FFN, multi-cabeça).
-
-Detalhes completos de arquitetura, treino e resultados estão em
-[`MODEL_CARD.md`](MODEL_CARD.md).
+Detalhes completos de arquitetura, treino e resultados em [`MODEL_CARD.md`](MODEL_CARD.md).
 
 ---
 
@@ -81,154 +72,151 @@ Detalhes completos de arquitetura, treino e resultados estão em
 RoverMind-nanoGrump/
 ├── data/
 │   └── robot_voice_final.txt   # dataset: 2491 frases com personalidade
-├── tokenizer.py                # descobre o vocabulário → vocab.json
+│
+│   # --- Pipeline do modelo (Python) ---
 ├── dataset_gen.py              # gera o dataset sintético por moldes
+├── tokenizer.py                # descobre o vocabulário → vocab.json
 ├── model.py                    # arquitetura do mini-GPT (multi-cabeça)
 ├── train.py                    # treino com val split + checkpoint
 ├── generate.py                 # geração com temperatura + top-k
-├── vocab.json                  # vocabulário + metadados (gerado)
-├── modelo_treinado.pt          # pesos treinados (gerado)
-├── MODEL_CARD.md               # ficha técnica completa
+├── export.py                   # exporta os pesos → nano-grump.bin
 │
-├── 01_embedding_demo.py        # demos didáticos: cada peça isolada
-├── 02_posicao_demo.py
-├── 03_atencao_demo.py
-├── 04_ffn_demo.py
-└── 05_multihead_demo.py
+│   # --- Firmware (C / Arduino) ---
+├── firmware/
+│   ├── firmware.ino            # cérebro: inferência + display + UART (S3)
+│   └── partitions.csv          # layout da flash (partição "model")
+├── robo_corpo.ino              # corpo: navegação + envio de marcadores (WROOM-32)
+│
+│   # --- Documentação ---
+├── MODEL_CARD.md               # ficha técnica do modelo
+├── README.md                   # este arquivo
+│
+│   # --- Demos didáticos (pasta demos/) ---
+└── demos/
+    ├── 01_embedding_demo.py    # caractere → vetor
+    ├── 02_posicao_demo.py      # embedding de posição
+    ├── 03_atencao_demo.py      # self-attention (1 cabeça)
+    ├── 04_ffn_demo.py          # feed-forward
+    └── 05_multihead_demo.py    # atenção multi-cabeça
 ```
 
 ---
 
-## 🚀 Como executar
+## 🚀 Pipeline completo
 
-O projeto usa [`uv`](https://github.com/astral-sh/uv) para gerenciar o ambiente.
+### Parte A — Treinar o modelo (no PC)
 
-### Pré-requisitos
-
-- Python ≥ 3.12
-- `uv` instalado
-- GPU NVIDIA com CUDA (opcional — roda em CPU, só mais devagar)
-
-### Instalação
+Requer Python ≥ 3.12, [`uv`](https://github.com/astral-sh/uv), e idealmente GPU CUDA.
 
 ```bash
-git clone https://github.com/<seu-usuario>/RoverMind-nanoGrump.git
-cd RoverMind-nanoGrump
-uv sync
+uv sync                    # instala tudo (inclui PyTorch com CUDA)
+
+uv run dataset_gen.py      # 1. gera o dataset (~2400 frases sintéticas)
+uv run tokenizer.py        # 2. constrói o vocabulário (vocab.json)
+uv run train.py            # 3. treina (8000 passos, salva o melhor modelo)
+uv run generate.py         # 4. testa a geração no PC
 ```
 
-O `uv sync` instala tudo do `pyproject.toml`, incluindo o PyTorch com CUDA.
-
-### Pipeline completo
-
-Rode nesta ordem. Cada passo depende do anterior.
-
-**1. Gerar o dataset** (opcional — já vem pronto em `data/`)
+### Parte B — Embarcar no ESP32-S3 (o cérebro)
 
 ```bash
-uv run dataset_gen.py
+uv run export.py           # 5. gera nano-grump.bin (~840 KB)
 ```
 
-Combina moldes e bancos de palavras para gerar ~2400 frases sintéticas
-balanceadas por marcador.
-
-**2. Construir o vocabulário**
+Grave o binário na partição de dados da flash (segure BOOT durante a conexão):
 
 ```bash
-uv run tokenizer.py
+python -m esptool --chip esp32s3 --port COMxx \
+  write-flash 0x110000 nano-grump.bin
 ```
 
-Descobre os 59 caracteres únicos do dataset e salva `vocab.json`.
+Depois, no **Arduino IDE**:
+- Abra `firmware/firmware.ino`
+- Placa: **ESP32S3 Dev Module** · PSRAM: **OPI PSRAM** · Partition Scheme: **Custom**
+- Faça o upload
 
-**3. Treinar o modelo**
+### Parte C — Programar o corpo (ESP32-WROOM-32)
 
-```bash
-uv run train.py
+- Abra `robo_corpo.ino`
+- Defina `MODO_SIMULACAO false` para o robô físico (ou `true` para o Wokwi)
+- Placa: **ESP32 Dev Module** · Faça o upload (segure BOOT)
+
+### Parte D — Ligar os dois
+
+```
+WROOM-32 GPIO17 (TX) ─────→ GPIO18 (RX) do S3
+WROOM-32 GND ──────────────  GND do S3
 ```
 
-Treina por 8000 passos com split treino/validação, salvando o melhor modelo em
-`modelo_treinado.pt`. Na RTX 4050 leva poucos minutos.
+Dois fios: dados (TX→RX) e o terra comum (essencial para a UART). Cada placa na sua
+própria alimentação. Ligue, e o robô comenta cada situação sozinho.
 
-**4. Fazer o robô falar**
-
-```bash
-uv run generate.py
-```
-
-Gera frases para cada marcador de situação. Esta é a saída final — o grump
-falando.
-
-### Explorar as peças (opcional)
-
-Cada demo mostra uma peça do Transformer isoladamente, com números pequenos:
-
-```bash
-uv run 01_embedding_demo.py    # caractere → vetor
-uv run 02_posicao_demo.py      # embedding de posição
-uv run 03_atencao_demo.py      # self-attention (1 cabeça)
-uv run 04_ffn_demo.py          # feed-forward
-uv run 05_multihead_demo.py    # atenção multi-cabeça
-```
-
----
-
-## 🎛️ Ajustando a geração
-
-Em `generate.py`, no topo, você pode mexer nos parâmetros:
-
-```python
-TEMPERATURA    = 0.75    # < 1 mais "certinho"; > 1 mais "criativo"
-TOP_K          = 4       # quantos caracteres mais prováveis manter
-N_POR_MARCADOR = 3       # quantas frases por marcador
-```
-
-A configuração padrão (`top_k=4`, `temp=0.75`) foi escolhida após comparar várias
-combinações — é o equilíbrio entre frases limpas e variedade. Valores menores
-deixam mais conservador (limpo, porém repetitivo); maiores deixam mais criativo
-(variado, porém com mais palavras tortas).
+> **Dica de gravação:** ao regravar qualquer um dos ESP32, desconecte o fio de dados
+> TX→RX entre eles — a UART ativa pode interferir no upload.
 
 ---
 
 ## 🎭 Os 8 marcadores de situação
 
-| Marcador | Situação | Energia |
-|---|---|---|
-| `<start>` | Ligou | Sonolento, relutante |
-| `<explore>` | Explorando | Indiferente, filosófico |
-| `<obstacle>` | Achou obstáculo | Irritado, sarcástico |
-| `<turn_left>` | Virando à esquerda | Irônico sobre a decisão |
-| `<turn_right>` | Virando à direita | Espelho do esquerdo |
-| `<backup>` | Recuando | "Recuo estratégico" |
-| `<stuck>` | Preso | Resignação existencial |
-| `<clear>` | Caminho livre | Alívio irônico |
+| Marcador | Disparado quando | Olhos | Energia |
+|---|---|---|---|
+| `<start>` | Liga | feliz | Sonolento, relutante |
+| `<explore>` | Andando em frente | curioso | Indiferente, filosófico |
+| `<obstacle>` | Detecta obstáculo | alerta | Irritado, sarcástico |
+| `<turn_left>` | Curva à esquerda | olha ← | Irônico |
+| `<turn_right>` | Curva à direita | olha → | Irônico |
+| `<backup>` | Recuando | preocupado | "Recuo estratégico" |
+| `<stuck>` | Os dois lados bloqueados | travado | Resignação existencial |
+| `<clear>` | Caminho livre após evasão | aliviado | Alívio irônico |
 
 ---
 
-## 🗺️ Estado e próximos passos
+## 🔌 Hardware
 
-**Versão atual: v2** — arquitetura multi-cabeça, dataset de 2491 frases, geração
-com top-k. Modelo utilizável e demonstrável.
+**Corpo (ESP32-WROOM-32):**
 
-Próximos marcos:
+| Componente | Pino |
+|---|---|
+| HC-SR04 TRIG / ECHO | GPIO32 / GPIO33 |
+| Servo SG90 | GPIO13 |
+| L298N ENA/IN1/IN2 | GPIO23 / GPIO22 / GPIO21 |
+| L298N IN3/IN4/ENB | GPIO19 / GPIO18 / GPIO5 |
+| UART TX → cérebro | GPIO17 |
 
-1. **Refinar o dataset (v2.1)** — melhorar os marcadores `<clear>` e `<stuck>`,
-   que ainda confundem vocabulário com `<obstacle>`.
-2. **Embarcar no ESP32-S3** — exportar os pesos e rodar a inferência em C no
-   hardware.
-3. **Comunicação corpo ↔ cérebro** — o WROOM-32 envia o marcador, o S3 devolve a
-   frase, exibida no display + LEDs.
+**Cérebro (ESP32-S3 N16R8):**
+
+| Componente | Pino |
+|---|---|
+| OLED SH1106 CLK/MOSI | GPIO12 / GPIO11 |
+| OLED CS/DC/RES | GPIO8 / GPIO9 / GPIO10 |
+| UART RX ← corpo | GPIO18 |
+
+Alimentação do corpo: 4×AA (~6V) → L298N → 5V regulado → VIN do ESP32. Todos os GNDs
+unidos (incluindo o terra comum com o cérebro).
+
+---
+
+## 🗺️ Estado e backlog
+
+**Funcionando:** modelo treinado, embarcado no S3, comunicação UART com o corpo, os
+8 marcadores disparados pela navegação real, display com olhos e fala progressiva.
+
+**Backlog:**
+1. **Debounce de marcadores** — sincronizar a fala com o ritmo das ações (numa
+   janela de tempo, só a última ação vale).
+2. **Refinar dataset** — melhorar `<clear>` e `<stuck>` (marcadores mais fracos).
+3. **Polimento do display** — animações dos olhos, indicador de "pensando".
+4. **Autonomia de energia** — rodar de bateria, sem cabos USB.
 
 ---
 
 ## 📚 Filosofia do projeto
 
-Este projeto segue um princípio: **entender antes de integrar**. Nada de caixas
-pretas. Cada peça — tokenizer, embedding, atenção, FFN — foi construída e testada
-isoladamente antes de virar parte do modelo. Os demos numerados são o registro
-dessa jornada de aprendizado.
-
-O objetivo não é só ter um robô que fala melhor — é entender, camada por camada,
-como um Transformer aprende linguagem.
+**Entender antes de integrar.** Nada de caixas pretas. Cada peça — tokenizer,
+embedding, atenção, FFN, multi-cabeça, e a inferência em C — foi construída e testada
+isoladamente antes de virar parte do todo. Os demos numerados são o registro dessa
+jornada. O objetivo não é só um robô que fala: é entender, camada por camada, como um
+Transformer aprende linguagem e como roda em hardware limitado.
 
 ---
 
