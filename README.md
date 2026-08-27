@@ -1,4 +1,4 @@
-# 🤖 RoverMind — nano-grump
+# RoverMind — nano-grump
 
 > Um robô autônomo de dois cérebros que anda sozinho, desvia de obstáculos e
 > **comenta cada situação com uma personalidade sarcástica** — gerada por um
@@ -22,7 +22,7 @@ do dataset ao firmware de inferência em C.
 
 ---
 
-## 🎯 Arquitetura de dois cérebros
+## Arquitetura de dois cérebros
 
 ```
                     ROBÔ
@@ -47,7 +47,7 @@ por UART (o corpo envia o marcador, o cérebro gera e exibe).
 
 ---
 
-## 🧠 O modelo (nano-grump v2)
+## O modelo (nano-grump v2)
 
 Um mini-GPT decoder-only, nível de caractere, montado peça por peça:
 
@@ -66,7 +66,7 @@ Detalhes completos de arquitetura, treino e resultados em [`MODEL_CARD.md`](MODE
 
 ---
 
-## 📁 Estrutura do repositório
+## Estrutura do repositório
 
 ```
 RoverMind-nanoGrump/
@@ -102,7 +102,7 @@ RoverMind-nanoGrump/
 
 ---
 
-## 🚀 Pipeline completo
+## Pipeline completo
 
 ### Parte A — Treinar o modelo (no PC)
 
@@ -156,7 +156,7 @@ própria alimentação. Ligue, e o robô comenta cada situação sozinho.
 
 ---
 
-## 🎭 Os 8 marcadores de situação
+## Os 8 marcadores de situação
 
 | Marcador | Disparado quando | Olhos | Energia |
 |---|---|---|---|
@@ -171,7 +171,7 @@ própria alimentação. Ligue, e o robô comenta cada situação sozinho.
 
 ---
 
-## 🔌 Hardware
+## Hardware
 
 **Corpo (ESP32-WROOM-32):**
 
@@ -196,7 +196,7 @@ unidos (incluindo o terra comum com o cérebro).
 
 ---
 
-## 🗺️ Estado e backlog
+## Estado e backlog
 
 **Funcionando:** modelo treinado, embarcado no S3, comunicação UART com o corpo, os
 8 marcadores disparados pela navegação real, display com olhos e fala progressiva.
@@ -210,7 +210,7 @@ unidos (incluindo o terra comum com o cérebro).
 
 ---
 
-## 📚 Filosofia do projeto
+## Filosofia do projeto
 
 **Entender antes de integrar.** Nada de caixas pretas. Cada peça — tokenizer,
 embedding, atenção, FFN, multi-cabeça, e a inferência em C — foi construída e testada
@@ -220,4 +220,4 @@ Transformer aprende linguagem e como roda em hardware limitado.
 
 ---
 
-*nano-grump — um robô que preferiria estar carregando.* 🔋
+*nano-grump — um robô que preferiria estar carregando.* 
