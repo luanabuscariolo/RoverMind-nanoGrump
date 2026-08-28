@@ -223,4 +223,37 @@ Transformer aprende linguagem e como roda em hardware limitado.
 
 ---
 
+---
+
+## Licença
+
+Este projeto usa **duas licenças**, conforme o tipo de conteúdo:
+
+### 📚 Documentação, tutoriais, imagens e dataset
+**[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)** — Attribution-NonCommercial-ShareAlike
+
+Abrange: `README.md`, `MODEL_CARD.md`, todo o material didático, diagramas,
+fotografias e o dataset `data/robot_voice_final.txt`.
+
+- ✅ Compartilhar e adaptar livremente
+- 📌 Com atribuição
+- 🚫 **Sem uso comercial**
+- 🔄 Derivados sob a mesma licença
+
+### 💻 Código-fonte
+**[MIT](https://opensource.org/licenses/MIT)**
+
+Abrange: os scripts Python (`model.py`, `train.py`, `tokenizer.py`,
+`generate.py`, `export.py`, `dataset_gen.py`, `demos/`) e o firmware
+C/Arduino (`firmware/`, `robo_corpo.ino`).
+
+Livre para uso, inclusive comercial, mantendo o aviso de copyright.
+
+> **Em resumo:** aprenda com o código e use como quiser. Mas o material
+> didático — o curso, os textos, as imagens — não pode ser revendido.
+
+Textos completos em [`LICENSE`](LICENSE) e [`LICENSE-CODE`](LICENSE-CODE).
+
+---
+
 *nano-grump — um robô que preferiria estar carregando.* 
