@@ -1,5 +1,8 @@
 # RoverMind — nano-grump
 
+[![Docs: CC BY-NC-SA 4.0](https://img.shields.io/badge/Docs-CC%20BY--NC--SA%204.0-534AB7.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+[![Code: MIT](https://img.shields.io/badge/Code-MIT-0F6E56.svg)](https://opensource.org/license/mit)
+
 > Um robô autônomo de dois cérebros que anda sozinho, desvia de obstáculos e
 > **comenta cada situação com uma personalidade sarcástica** — gerada por um
 > mini-GPT treinado do zero e rodando em C num microcontrolador.
